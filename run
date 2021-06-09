@@ -1,0 +1,9 @@
+#!/usr/bin/env node
+const caporal = require('@caporal/core').program;
+
+require(`${__dirname}/src/run`).run({
+  caporal,
+  projectRoot: __dirname,
+  scriptsIndexModule: `./scripts/index`,
+  testsLocations: [`./src/**/*.test.js`]
+});

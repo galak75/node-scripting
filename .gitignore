@@ -1,0 +1,17 @@
+output
+temp
+node_modules
+/log
+.idea
+.eslintrc.json
+/*.log
+/test-*
+/src/test.ts
+yarn.lock
+/dist
+
+*.map
+*.d.ts
+*.js
+!/src/run.js
+!/prettier.config.js
