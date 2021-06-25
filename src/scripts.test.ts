@@ -4,7 +4,7 @@
 // tslint:disable: no-console
 // ==========================================
 import { program as caporal, Program } from '@caporal/core';
-import { globalConstants, utils } from '@villemontreal/core-utils-general-nodejs-lib';
+import { globalConstants, utils } from '@villedemontreal/general-utils';
 import { assert } from 'chai';
 import * as fs from 'fs-extra';
 import * as path from 'path';

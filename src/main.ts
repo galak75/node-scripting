@@ -1,6 +1,6 @@
 // tslint:disable:no-console
 import { Action, ActionParameters, chalk, Command, Program } from '@caporal/core';
-import { globalConstants } from '@villemontreal/core-utils-general-nodejs-lib';
+import { globalConstants } from '@villedemontreal/general-utils';
 import { IScriptConstructor, ScriptBase, TESTING_SCRIPT_NAME_PREFIX } from './scriptBase';
 
 /**

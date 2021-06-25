@@ -11,6 +11,6 @@ export abstract class CoreLintScriptBase<
   A extends ParsedArgumentsObject = {}
 > extends CoreScriptBase<O, GO, A> {
   protected get requiredDependencies(): string[] {
-    return ['@villemontreal/lint-config-villemontreal'];
+    return ['@villedemontreal/lint-config'];
   }
 }

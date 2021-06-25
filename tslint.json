@@ -1,3 +1,3 @@
 {
-    "extends": "@villemontreal/lint-config-villemontreal/rules/tslint-node"
+    "extends": "@villedemontreal/lint-config/rules/tslint-node"
 }

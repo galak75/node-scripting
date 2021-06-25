@@ -4,7 +4,7 @@ const path = require('path');
 const fs = require('fs-extra');
 const _ = require('lodash');
 const chalk = require('@caporal/core').chalk;
-const globalConstants = require('@villemontreal/core-utils-general-nodejs-lib').globalConstants;
+const globalConstants = require('@villedemontreal/general-utils').globalConstants;
 
 let _isScriptingLibItself;
 
@@ -214,7 +214,7 @@ function isScriptingLibItself() {
     const packageJsonPath = path.resolve(`${__dirname}/../package.json`);
     if (fs.existsSync(packageJsonPath)) {
       const packageJsonObj = require(packageJsonPath);
-      _isScriptingLibItself = packageJsonObj.name === '@villemontreal/core-utils-scripting-core-nodejs-lib';
+      _isScriptingLibItself = packageJsonObj.name === '@villedemontreal/scripting';
     }
   }
 

@@ -8,7 +8,7 @@ import {
   ParsedOptions,
   Program
 } from '@caporal/core';
-import { globalConstants, utils } from '@villemontreal/core-utils-general-nodejs-lib';
+import { globalConstants, utils } from '@villedemontreal/general-utils';
 import { StdioOptions } from 'child_process';
 import * as _ from 'lodash';
 import { configs } from './config/configs';

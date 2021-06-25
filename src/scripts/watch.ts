@@ -1,5 +1,5 @@
 import { Command } from '@caporal/core';
-import { utils } from '@villemontreal/core-utils-general-nodejs-lib';
+import { utils } from '@villedemontreal/general-utils';
 import * as _ from 'lodash';
 import * as path from 'path';
 import { configs } from '../config/configs';

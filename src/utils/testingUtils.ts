@@ -1,6 +1,6 @@
 // tslint:disable: no-console
 import { program as caporal } from '@caporal/core';
-import { globalConstants, utils } from '@villemontreal/core-utils-general-nodejs-lib';
+import { globalConstants, utils } from '@villedemontreal/general-utils';
 import { assert } from 'chai';
 import { execSync } from 'child_process';
 import * as fs from 'fs-extra';

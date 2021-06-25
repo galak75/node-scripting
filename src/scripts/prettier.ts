@@ -11,7 +11,7 @@ export class PrettierScript extends CoreLintScriptBase {
   }
 
   protected async main() {
-    const { prettierCheck } = require(`${configs.projectRoot}/node_modules/@villemontreal/lint-config-villemontreal`);
+    const { prettierCheck } = require(`${configs.projectRoot}/node_modules/@villedemontreal/lint-config`);
     await prettierCheck(configs.projectRoot);
   }
 }
