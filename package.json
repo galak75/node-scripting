@@ -42,7 +42,7 @@
     "@villedemontreal/general-utils": "5.15.3",
     "fs-extra": "9.1.0",
     "is-class": "0.0.9",
-    "lodash": "4.17.20",
+    "lodash": "4.17.21",
     "node-notifier": "9.0.0"
   },
   "devDependencies": {
