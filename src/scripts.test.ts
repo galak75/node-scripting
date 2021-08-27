@@ -624,4 +624,17 @@ info: Script "testing:testingCallingScript" successful`;
       assert.isTrue(output.indexOf(`MAIN NODE_APP_INSTANCE: tests`) > -1);
     });
   });
+
+  describe('Sonar-init script', () => {
+    it(` should fail when sonar-project.properties is missing`, async () => {
+      const { output, isSuccess } = await run(`sonar-init`);
+      assert.isFalse(isSuccess);
+
+      const expectedOutput = `info: Script "sonar-init" starting...
+
+error: Script "sonar-init" failed after 0 s with: ENOENT: no such file or directory, open 'sonar-project.properties'
+`;
+      assert.isTrue(containsText(output, expectedOutput));
+    });
+  });
 });
