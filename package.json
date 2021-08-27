@@ -39,18 +39,19 @@
     "@caporal/core": "2.0.2",
     "@types/fs-extra": "9.0.6",
     "@types/lodash": "4.14.168",
-    "@types/superagent": "^4.1.12",
     "@villedemontreal/general-utils": "5.15.3",
     "fs-extra": "9.1.0",
     "is-class": "0.0.9",
     "java-properties": "1.0.2",
     "lodash": "4.17.21",
-    "node-notifier": "9.0.0"
+    "node-notifier": "9.0.0",
+    "superagent": "6.1.0"
   },
   "devDependencies": {
     "@types/chai": "4.2.14",
     "@types/mocha": "8.2.0",
     "@types/sinon": "9.0.10",
+    "@types/superagent": "4.1.12",
     "@villedemontreal/lint-config": "1.7.3",
     "chai": "4.2.0",
     "mocha": "8.2.1",
