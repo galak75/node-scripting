@@ -20,8 +20,9 @@ import {
   withCustomRunFile,
   withLogNodeInstance
 } from './utils/testingUtils';
+import nock = require('nock');
 
-describe(`Scripts tests`, function() {
+describe(`Scripts tests`, function () {
   timeout(this, 30000);
 
   before(() => {
@@ -29,7 +30,7 @@ describe(`Scripts tests`, function() {
   });
 
   describe(`Compilation`, () => {
-    it(`Default`, async function() {
+    it(`Default`, async function () {
       timeout(this, 60000);
 
       const distDir = path.resolve(`${__dirname}/..`);
@@ -37,7 +38,7 @@ describe(`Scripts tests`, function() {
       await utils.deleteDir(distDir);
       assert.isFalse(fs.existsSync(distDir));
 
-      const { output, isSuccess } = await run(`testing:testingScript`);
+      const {output, isSuccess} = await run(`testing:testingScript`);
       assert.isTrue(isSuccess);
 
       assert.isTrue(output.indexOf(`Compilation done.`) > -1);
@@ -52,7 +53,7 @@ describe(`Scripts tests`, function() {
     });
 
     it(`No compilation`, async () => {
-      const { output, isSuccess } = await run(`testing:testingScript`, `--nc`);
+      const {output, isSuccess} = await run(`testing:testingScript`, `--nc`);
       assert.isTrue(isSuccess);
 
       assert.isFalse(output.indexOf(`Compilation done.`) > -1);
@@ -62,7 +63,7 @@ describe(`Scripts tests`, function() {
     });
 
     it(`Compilation silent option`, async () => {
-      const { output, isSuccess } = await run(`testing:testingScript`, `--nc`, `--silent`);
+      const {output, isSuccess} = await run(`testing:testingScript`, `--nc`, `--silent`);
       assert.isTrue(isSuccess);
 
       assert.isFalse(output.indexOf(`Compilation done.`) > -1);
@@ -74,7 +75,7 @@ describe(`Scripts tests`, function() {
 
   describe(`Logs`, () => {
     it(`Default is info`, async () => {
-      const { output, isSuccess } = await run(`testing:testingScript`, `--nc`);
+      const {output, isSuccess} = await run(`testing:testingScript`, `--nc`);
       assert.isTrue(isSuccess);
 
       assert.isFalse(output.indexOf(`msg: debug`) > -1);
@@ -84,7 +85,7 @@ describe(`Scripts tests`, function() {
     });
 
     it(`Silent arg`, async () => {
-      const { output, isSuccess } = await run(`testing:testingScript`, `--nc`, `--silent`);
+      const {output, isSuccess} = await run(`testing:testingScript`, `--nc`, `--silent`);
       assert.isTrue(isSuccess);
 
       assert.isFalse(output.indexOf(`msg: debug`) > -1);
@@ -94,7 +95,7 @@ describe(`Scripts tests`, function() {
     });
 
     it(`Quiet arg`, async () => {
-      const { output, isSuccess } = await run(`testing:testingScript`, `--nc`, `--quiet`);
+      const {output, isSuccess} = await run(`testing:testingScript`, `--nc`, `--quiet`);
       assert.isTrue(isSuccess);
 
       assert.isFalse(output.indexOf(`msg: debug`) > -1);
@@ -104,7 +105,7 @@ describe(`Scripts tests`, function() {
     });
 
     it(`Verbose arg`, async () => {
-      const { output, isSuccess } = await run(`testing:testingScript`, `--nc`, `--verbose`);
+      const {output, isSuccess} = await run(`testing:testingScript`, `--nc`, `--verbose`);
       assert.isTrue(isSuccess);
 
       assert.isTrue(output.indexOf(`msg: debug`) > -1);
@@ -114,7 +115,7 @@ describe(`Scripts tests`, function() {
     });
 
     it(`Verbose short arg`, async () => {
-      const { output, isSuccess } = await run(`testing:testingScript`, `--nc`, `-v`);
+      const {output, isSuccess} = await run(`testing:testingScript`, `--nc`, `-v`);
       assert.isTrue(isSuccess);
 
       assert.isTrue(output.indexOf(`msg: debug`) > -1);
@@ -125,10 +126,10 @@ describe(`Scripts tests`, function() {
   });
 
   describe(`Main Help`, () => {
-    it(`No args at all - compilation is done and main help is displayed`, async function() {
+    it(`No args at all - compilation is done and main help is displayed`, async function () {
       timeout(this, 60000);
 
-      const { output, isSuccess } = await run();
+      const {output, isSuccess} = await run();
       assert.isTrue(isSuccess);
 
       assert.isTrue(output.indexOf(`Compilation done.`) > -1);
@@ -137,10 +138,10 @@ describe(`Scripts tests`, function() {
       assert.isTrue(isMainHelpDisplayed(output));
     });
 
-    it(`Just "help" and "--nc" - no compilation is done and main help is displayed`, async function() {
+    it(`Just "help" and "--nc" - no compilation is done and main help is displayed`, async function () {
       timeout(this, 60000);
 
-      const { output, isSuccess } = await run(`help`, `--nc`);
+      const {output, isSuccess} = await run(`help`, `--nc`);
       assert.isTrue(isSuccess);
 
       assert.isFalse(output.indexOf(`Compilation done.`) > -1);
@@ -148,10 +149,10 @@ describe(`Scripts tests`, function() {
       assert.isTrue(isMainHelpDisplayed(output));
     });
 
-    it(`Just "--help" - compilation is done and main help is displayed`, async function() {
+    it(`Just "--help" - compilation is done and main help is displayed`, async function () {
       timeout(this, 60000);
 
-      const { output, isSuccess } = await run(`--help`);
+      const {output, isSuccess} = await run(`--help`);
       assert.isTrue(isSuccess);
 
       assert.isTrue(output.indexOf(`Compilation done.`) > -1);
@@ -159,10 +160,10 @@ describe(`Scripts tests`, function() {
       assert.isTrue(isMainHelpDisplayed(output));
     });
 
-    it(`Just "-h" - compilation is done and main help is displayed`, async function() {
+    it(`Just "-h" - compilation is done and main help is displayed`, async function () {
       timeout(this, 60000);
 
-      const { output, isSuccess } = await run(`-h`);
+      const {output, isSuccess} = await run(`-h`);
       assert.isTrue(isSuccess);
 
       assert.isTrue(output.indexOf(`Compilation done.`) > -1);
@@ -172,7 +173,7 @@ describe(`Scripts tests`, function() {
     });
 
     it(`Just "--nc" - No compilation is done and main help is displayed`, async () => {
-      const { output, isSuccess } = await run(`--nc`);
+      const {output, isSuccess} = await run(`--nc`);
       assert.isTrue(isSuccess);
 
       assert.isFalse(output.indexOf(`Compilation done.`) > -1);
@@ -182,7 +183,7 @@ describe(`Scripts tests`, function() {
     });
 
     it(`"--help" and "--nc" - No compilation is done and main help is displayed`, async () => {
-      const { output, isSuccess } = await run(`--help`, `--nc`);
+      const {output, isSuccess} = await run(`--help`, `--nc`);
       assert.isTrue(isSuccess);
 
       assert.isFalse(output.indexOf(`Compilation done.`) > -1);
@@ -192,7 +193,7 @@ describe(`Scripts tests`, function() {
     });
 
     it(`"-h" and "--nc" - No compilation is done and main help is displayed`, async () => {
-      const { output, isSuccess } = await run(`-h`, `--nc`);
+      const {output, isSuccess} = await run(`-h`, `--nc`);
       assert.isTrue(isSuccess);
 
       assert.isFalse(output.indexOf(`Compilation done.`) > -1);
@@ -201,30 +202,30 @@ describe(`Scripts tests`, function() {
       assert.isTrue(isMainHelpDisplayed(output));
     });
 
-    it(`Unknown command - Main help is displayed`, async function() {
+    it(`Unknown command - Main help is displayed`, async function () {
       timeout(this, 60000);
 
-      const { output, isSuccess } = await run(`NOPE`, `--nc`);
+      const {output, isSuccess} = await run(`NOPE`, `--nc`);
       assert.isFalse(isSuccess);
 
       assert.isTrue(output.indexOf(`Unknown command NOPE`) > -1);
       assert.isTrue(isMainHelpDisplayed(output));
     });
 
-    it(`Unknown command with --silent arg - Main help not displayed`, async function() {
+    it(`Unknown command with --silent arg - Main help not displayed`, async function () {
       timeout(this, 60000);
 
-      const { output, isSuccess } = await run(`NOPE`, `--nc`, `--silent`);
+      const {output, isSuccess} = await run(`NOPE`, `--nc`, `--silent`);
       assert.isFalse(isSuccess);
 
       assert.isTrue(output.indexOf(`Unknown command NOPE`) > -1);
       assert.isFalse(isMainHelpDisplayed(output));
     });
 
-    it(`Unknown command with --quiet arg - Main help not displayed`, async function() {
+    it(`Unknown command with --quiet arg - Main help not displayed`, async function () {
       timeout(this, 60000);
 
-      const { output, isSuccess } = await run(`NOPE`, `--nc`, `--quiet`);
+      const {output, isSuccess} = await run(`NOPE`, `--nc`, `--quiet`);
       assert.isFalse(isSuccess);
 
       assert.isTrue(output.indexOf(`Unknown command NOPE`) > -1);
@@ -234,7 +235,7 @@ describe(`Scripts tests`, function() {
 
   describe(`Command Help`, () => {
     it(`Using "--help"`, async () => {
-      const { output, isSuccess } = await run(`testing:testingScript`, `--nc`, `--help`);
+      const {output, isSuccess} = await run(`testing:testingScript`, `--nc`, `--help`);
       assert.isTrue(isSuccess);
 
       assert.isTrue(output.indexOf(`A simple testing script`) > -1);
@@ -242,7 +243,7 @@ describe(`Scripts tests`, function() {
     });
 
     it(`Using "-h"`, async () => {
-      const { output, isSuccess } = await run(`testing:testingScript`, `--nc`, `-h`);
+      const {output, isSuccess} = await run(`testing:testingScript`, `--nc`, `-h`);
       assert.isTrue(isSuccess);
 
       assert.isTrue(output.indexOf(`A simple testing script`) > -1);
@@ -250,7 +251,7 @@ describe(`Scripts tests`, function() {
     });
 
     it(`Help command`, async () => {
-      const { output, isSuccess } = await run(`help`, `testing:testingScript`, `--nc`);
+      const {output, isSuccess} = await run(`help`, `testing:testingScript`, `--nc`);
       assert.isTrue(isSuccess);
 
       assert.isTrue(output.indexOf(`A simple testing script`) > -1);
@@ -258,7 +259,7 @@ describe(`Scripts tests`, function() {
     });
 
     it(`Command Help for hidden scripts works too`, async () => {
-      const { output, isSuccess } = await run(
+      const {output, isSuccess} = await run(
         `testing:testingHiddenScript`,
         `--nc`,
         `--userName`,
@@ -273,21 +274,21 @@ describe(`Scripts tests`, function() {
 
   describe(`Varia`, () => {
     it(`Custom short option`, async () => {
-      const { output, isSuccess } = await run(`testing:testingScript`, `--nc`, `-p`, `123`);
+      const {output, isSuccess} = await run(`testing:testingScript`, `--nc`, `-p`, `123`);
       assert.isTrue(isSuccess);
 
       assert.isTrue(output.indexOf(`port: 123`) > -1);
     });
 
     it(`Custom long option`, async () => {
-      const { output, isSuccess } = await run(`testing:testingScript`, `--nc`, `--port`, `123`);
+      const {output, isSuccess} = await run(`testing:testingScript`, `--nc`, `--port`, `123`);
       assert.isTrue(isSuccess);
 
       assert.isTrue(output.indexOf(`port: 123`) > -1);
     });
 
     it(`Option not specified but required ("--userName" here) - The help of the command is displayed`, async () => {
-      const { output, isSuccess } = await run(`testing:testingHiddenScript`, `--nc`);
+      const {output, isSuccess} = await run(`testing:testingHiddenScript`, `--nc`);
       assert.isFalse(isSuccess);
 
       assert.isFalse(output.indexOf(`userName is`) > -1);
@@ -296,7 +297,7 @@ describe(`Scripts tests`, function() {
     });
 
     it(`Regular Error (the help of the command is not printed!)`, async () => {
-      const { output, isSuccess } = await run(`testing:testingScript`, `--nc`, `--throwError`);
+      const {output, isSuccess} = await run(`testing:testingScript`, `--nc`, `--throwError`);
       assert.isFalse(isSuccess);
 
       assert.isTrue(output.indexOf(`This is a regular error`) > -1);
@@ -306,7 +307,7 @@ describe(`Scripts tests`, function() {
     });
 
     it(`Invalid argument`, async () => {
-      const { output, isSuccess } = await run(`testing:testingScript`, `--nc`, `--port`, `notANumber`);
+      const {output, isSuccess} = await run(`testing:testingScript`, `--nc`, `--port`, `notANumber`);
       assert.isFalse(isSuccess);
 
       assert.isTrue(output.indexOf(`Invalid value for option`) > -1);
@@ -315,7 +316,7 @@ describe(`Scripts tests`, function() {
     });
 
     it(`Hidden script can still be called`, async () => {
-      const { output, isSuccess } = await run(`testing:testingHiddenScript`, `--nc`, `--username`, `Stromgol`);
+      const {output, isSuccess} = await run(`testing:testingHiddenScript`, `--nc`, `--username`, `Stromgol`);
       assert.isTrue(isSuccess);
 
       assert.isTrue(output.indexOf(`username is Stromgol`) > -1);
@@ -368,7 +369,7 @@ describe(`Scripts tests`, function() {
         {
           get: (target, prop) => {
             // tslint:disable-next-line: only-arrow-functions
-            return function() {
+            return function () {
               if (prop === 'info') {
                 output += arguments[0] + '\n';
               }
@@ -393,14 +394,14 @@ describe(`Scripts tests`, function() {
 
     it(`OutputName - Regular script`, async () => {
       // Core script
-      const { output, isSuccess } = await run(`testing:testingScript`, `--nc`);
+      const {output, isSuccess} = await run(`testing:testingScript`, `--nc`);
       assert.isTrue(isSuccess);
       assert.isTrue(output.indexOf(`Script "testing:testingScript"`) > -1);
     });
 
     it(`OutputName - Core script`, async () => {
       // Core script
-      const { output, isSuccess } = await run(`testing:testingCoreScript`, `--nc`);
+      const {output, isSuccess} = await run(`testing:testingCoreScript`, `--nc`);
       assert.isTrue(isSuccess);
       assert.isTrue(output.indexOf(`Script "testing:testingCoreScript (core)"`) > -1);
     });
@@ -412,7 +413,7 @@ describe(`Scripts tests`, function() {
      * file and add it there.
      */
     it(`Custom global options`, async () => {
-      const { output, isSuccess } = await withCustomRunFile(
+      const {output, isSuccess} = await withCustomRunFile(
         `const caporal = require('@caporal/core').program;`,
         `const caporal = require('@caporal/core').program;
        caporal.option('--custom', 'Custom global option', {
@@ -430,7 +431,7 @@ describe(`Scripts tests`, function() {
     });
 
     it(`"scriptsIndexModule" can be undefined`, async () => {
-      const { output, isSuccess } = await withCustomRunFile(
+      const {output, isSuccess} = await withCustomRunFile(
         'scriptsIndexModule: `./scripts/index`,',
         ``,
         `prettier`,
@@ -444,7 +445,7 @@ describe(`Scripts tests`, function() {
     });
 
     it(`A required dependency is missing`, async () => {
-      const { output, isSuccess } = await run(`testing:testingDepMissingScript`, `--nc`);
+      const {output, isSuccess} = await run(`testing:testingDepMissingScript`, `--nc`);
       assert.isTrue(isSuccess);
 
       assert.isTrue(output.indexOf(`This script requires some dependencies that are not direct`) > -1);
@@ -457,7 +458,7 @@ describe(`Scripts tests`, function() {
 
   describe('Cascading scripts', () => {
     it(`Call subscript with defaults`, async () => {
-      const { output, isSuccess } = await run(`testing:testingCallingScript`, `--nc`, `--foo`, `55`);
+      const {output, isSuccess} = await run(`testing:testingCallingScript`, `--nc`, `--foo`, `55`);
       assert.isTrue(isSuccess);
 
       const expectedOutput = `info: Script "testing:testingCallingScript" starting...
@@ -474,7 +475,7 @@ info: Script "testing:testingCallingScript" successful`;
     });
 
     it(`Call subscript without defaults, with the "--verbose" global option`, async () => {
-      const { output, isSuccess } = await run(
+      const {output, isSuccess} = await run(
         `testing:testingCallingScript`,
         `--nc`,
         `--verbose`,
@@ -501,7 +502,7 @@ info: Script "testing:testingCallingScript" successful`;
     });
 
     it(`Call subscript without defaults, without the "--verbose" global option`, async () => {
-      const { output, isSuccess } = await run(
+      const {output, isSuccess} = await run(
         `testing:testingCallingScript`,
         `--nc`,
         // `--verbose`, // no verbose
@@ -528,7 +529,7 @@ info: Script "testing:testingCallingScript" successful`;
     });
 
     it(`Call subscript without defaults, with the "--verbose" global option but then forced to false`, async () => {
-      const { output, isSuccess } = await run(
+      const {output, isSuccess} = await run(
         `testing:testingCallingScript`,
         `--nc`,
         `--verbose`, // verbose
@@ -556,7 +557,7 @@ info: Script "testing:testingCallingScript" successful`;
     });
 
     it(`Call failing subscript`, async () => {
-      const { output, isSuccess } = await run(
+      const {output, isSuccess} = await run(
         `testing:testingCallingScript`,
         `--nc`,
         `--foo`,
@@ -600,7 +601,7 @@ info: Script "testing:testingCallingScript" successful`;
     it(`test script -> set to "tests" automatically`, async () => {
       delete process.env[globalConstants.envVariables.NODE_APP_INSTANCE];
 
-      const { output, isSuccess } = await withLogNodeInstance(`testing:testingScript`, `--nc`);
+      const {output, isSuccess} = await withLogNodeInstance(`testing:testingScript`, `--nc`);
       assert.isTrue(isSuccess);
 
       assert.isTrue(output.indexOf(`MAIN NODE_APP_INSTANCE: tests`) > -1);
@@ -609,7 +610,7 @@ info: Script "testing:testingCallingScript" successful`;
     it(`non test script -> not set to "tests"`, async () => {
       delete process.env[globalConstants.envVariables.NODE_APP_INSTANCE];
 
-      const { output, isSuccess } = await withLogNodeInstance(`prettier`, `--nc`);
+      const {output, isSuccess} = await withLogNodeInstance(`prettier`, `--nc`);
       assert.isTrue(isSuccess);
 
       assert.isTrue(output.indexOf(`MAIN NODE_APP_INSTANCE: undefined`) > -1);
@@ -618,7 +619,7 @@ info: Script "testing:testingCallingScript" successful`;
     it(`non test script with "--testing"`, async () => {
       delete process.env[globalConstants.envVariables.NODE_APP_INSTANCE];
 
-      const { output, isSuccess } = await withLogNodeInstance(`prettier`, `--nc`, `--testing`);
+      const {output, isSuccess} = await withLogNodeInstance(`prettier`, `--nc`, `--testing`);
       assert.isTrue(isSuccess);
 
       assert.isTrue(output.indexOf(`MAIN NODE_APP_INSTANCE: tests`) > -1);
@@ -627,7 +628,7 @@ info: Script "testing:testingCallingScript" successful`;
 
   describe('Sonar-init script', () => {
     it(` should fail when sonar-project.properties is missing`, async () => {
-      const { output, isSuccess } = await run(`sonar-init`);
+      const {output, isSuccess} = await run(`sonar-init`);
       assert.isFalse(isSuccess);
 
       const expectedOutput = `info: Script "sonar-init" starting...
@@ -635,6 +636,39 @@ info: Script "testing:testingCallingScript" successful`;
 error: Script "sonar-init" failed after 0 s with: ENOENT: no such file or directory, open 'sonar-project.properties'
 `;
       assert.isTrue(containsText(output, expectedOutput));
+    });
+
+    describe(' with valid sonar-project.properties file', async () => {
+      before(async () => {
+        await fs.copyFile('./src/utils/test-sonar-project.properties', './sonar-project.properties');
+      })
+      after(async () => {
+        await fs.unlink('./sonar-project.properties');
+      })
+
+      afterEach(() => {
+        nock.cleanAll();
+      })
+
+      it.only(` should do something`, async () => {
+        nock('https://example.com')
+          .get('/sonar/api/project_branches/list')
+          .query({project: 'my-project-key'})
+          .reply(200)
+          .persist();
+
+        const {output, isSuccess} = await run(`sonar-init`, '-v');
+
+        assert.isTrue(nock.isDone(), nock.pendingMocks().toString());
+
+        assert.isTrue(isSuccess);
+
+        const expectedOutput = `info: Script "sonar-init" starting...
+
+error: Script "sonar-init" failed after 0 s with: ENOENT: no such file or directory, open 'sonar-project.properties'
+`;
+        assert.isTrue(containsText(output, expectedOutput));
+      });
     });
   });
 });
