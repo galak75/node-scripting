@@ -46,6 +46,11 @@ export class SonarInitScript extends ScriptBase<Options> {
 
   private async sonarProjectAlreadyExists(sonarProjectKey: string, sonarHostUrl: string): Promise<boolean> {
     let res;
+
+    this.logger.debug(
+      `*** Calling Sonar API to check whether ${sonarProjectKey} project exists in ${sonarHostUrl} Sonar instance...`
+    );
+
     try {
       res = await request
         .get(new URL('api/project_branches/list', sonarHostUrl).toString())
