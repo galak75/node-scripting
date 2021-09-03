@@ -654,8 +654,11 @@ error: Script "sonar-init" failed after 0 s with: ENOENT: no such file or direct
         nock('https://example.com')
           .get('/sonar/api/project_branches/list')
           .query({project: 'my-project-key'})
-          .reply(200)
-          .persist();
+          .reply(200);
+
+        nock('https://example.com')
+          .get('/sonar/api/another_endpoint')
+          .reply(200);
 
         const {output, isSuccess} = await run(`sonar-init`, '-v');
 
