@@ -659,7 +659,11 @@ error: Script "sonar-init" failed after 0 s with: ENOENT: no such file or direct
 
         const {output, isSuccess} = await run(`sonar-init`, '-v');
 
-        assert.isTrue(nock.isDone(), nock.pendingMocks().toString());
+        console.info('***** Pending mocks *****');
+        console.info(nock.pendingMocks());
+        console.info('*************************');
+
+        assert.isTrue(nock.isDone(), `There are remaining expected HTTP calls: ${nock.pendingMocks().toString()}`);
 
         assert.isTrue(isSuccess);
 
