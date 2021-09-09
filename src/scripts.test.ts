@@ -20,7 +20,7 @@ import {
   withCustomRunFile,
   withLogNodeInstance
 } from './utils/testingUtils';
-import nock = require('nock');
+const nock = require('nock');
 
 describe(`Scripts tests`, function () {
   timeout(this, 30000);
