@@ -626,11 +626,7 @@ info: Script "testing:testingCallingScript" successful`;
     });
   });
 
-  // Skipping this unit test suite: all these tests are integration tests on scripts; scripts are
-  // executed in another spawned process; therefore, using Nock to stub http calls does not work.
-  // One solution to make these tests succeed would be to run a sonar server in a side-car container,
-  // and then use it to test 'sonar' and 'sonar-init' scripts.
-  describe.skip('Sonar-init script', () => {
+  describe('Sonar-init script', () => {
     it(` should fail when sonar-project.properties is missing`, async () => {
       const {output, isSuccess} = await run(`sonar-init`);
       assert.isFalse(isSuccess);
@@ -642,7 +638,11 @@ error: Script "sonar-init" failed after 0 s with: ENOENT: no such file or direct
       assert.isTrue(containsText(output, expectedOutput));
     });
 
-    describe(' with valid sonar-project.properties file', async () => {
+    // Skipping this unit test suite: all these tests are integration tests on scripts; scripts are
+    // executed in another spawned process; therefore, using Nock to stub http calls does not work.
+    // One solution to make these tests succeed would be to run a sonar server in a side-car container,
+    // and then use it to test 'sonar' and 'sonar-init' scripts.
+    describe.skip(' with valid sonar-project.properties file', async () => {
       before(async () => {
         await fs.copyFile('./src/utils/test-sonar-project.properties', './sonar-project.properties');
       })
