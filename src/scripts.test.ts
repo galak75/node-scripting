@@ -650,7 +650,7 @@ error: Script "sonar-init" failed after 0 s with: ENOENT: no such file or direct
         nock.cleanAll();
       })
 
-      it.only(` should do something`, async () => {
+      it(` should do something`, async () => {
         nock('https://example.com')
           .get('/sonar/api/project_branches/list')
           .query({project: 'my-project-key'})
