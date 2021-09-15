@@ -3,17 +3,13 @@
 // tslint:disable:no-console
 // ==========================================
 import { describe, it } from 'mocha';
-import { assert, expect } from 'chai';
-import { containsText, setTestingConfigs, timeout } from '../utils/testingUtils';
-import { run } from '../run';
-import { Program } from '@caporal/core';
+import { expect } from 'chai';
+import { setTestingConfigs, timeout } from '../utils/testingUtils';
 import { SonarInitScript } from './sonarInit';
 import * as sinon from 'sinon';
 
 const chai = require('chai');
 chai.use(require('chai-as-promised'));
-
-let caporal: Program;
 
 describe('Test sonar-init script', function() {
   timeout(this, 30000);
@@ -22,45 +18,7 @@ describe('Test sonar-init script', function() {
     setTestingConfigs();
   });
 
-  beforeEach(() => {
-    caporal = require('@caporal/core').program;
-  });
-
-  const scriptUnderTest = new SonarInitScript({
-    args: {},
-    ddash: [],
-    options: { shouldAlreadyExist: false },
-    program: caporal,
-    // command: contextual command if any??,
-    logger: undefined
-  });
-
-  it.skip(` should fail when sonar-project.properties is missing`, async () => {
-    await scriptUnderTest.run();
-
-    const expectedOutput = `info: Script "sonar-init" starting...
-
-error: Script "sonar-init" failed after 0 s with: ENOENT: no such file or directory, open 'sonar-project.properties'
-`;
-    assert.isTrue(containsText('FAIL', expectedOutput));
-  });
-
-  it.skip(` should still fail when sonar-project.properties is missing`, async () => {
-    await run({
-      caporal,
-      projectRoot: __dirname,
-      scriptsIndexModule: `./scripts/index`,
-      testsLocations: [`./src/**/*.test.js`]
-    });
-
-    const expectedOutput = `info: Script "sonar-init" starting...
-
-error: Script "sonar-init" failed after 0 s with: ENOENT: no such file or directory, open 'sonar-project.properties'
-`;
-    assert.isTrue(containsText('FAIL', expectedOutput));
-  });
-
-  it(` should really fail when sonar-project.properties is missing`, async () => {
+  it(` should fail when sonar-project.properties is missing`, async () => {
     let output = '';
     const logger = new Proxy(
       {},
