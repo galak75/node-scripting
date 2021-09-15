@@ -24,6 +24,27 @@ function getSonarInitScript(shouldAlreadyExist: boolean, logger: {}) : SonarInit
   });
 }
 
+class LoggerRecorder {
+  logger: {};
+  recordedLogs: string;
+  constructor() {
+    this.recordedLogs = '';
+    // tslint:disable-next-line:no-this-assignment
+    const that = this;
+    this.logger = new Proxy(
+      {},
+      {
+        get: (target, prop) => {
+          // tslint:disable-next-line: only-arrow-functions
+          return function() {
+            that.recordedLogs += `${prop.toString()}: ${arguments[0]}\n`;
+          };
+        }
+      }
+    );
+  }
+}
+
 describe('Test sonar-init script', function() {
   timeout(this, 30000);
 
@@ -32,27 +53,15 @@ describe('Test sonar-init script', function() {
   });
 
   it(` should fail when sonar-project.properties is missing`, async () => {
-    let output = '';
-    const logger = new Proxy(
-      {},
-      {
-        get: (target, prop) => {
-          // tslint:disable-next-line: only-arrow-functions
-          return function() {
-            output += `${prop.toString()}: ${arguments[0]}\n`;
-          };
-        }
-      }
-    );
-
-    const sonarInitScript = getSonarInitScript(false, logger);
+    const loggerRecorder = new LoggerRecorder();
+    const sonarInitScript = getSonarInitScript(false, loggerRecorder.logger);
 
     await expect(sonarInitScript.run()).to.be.rejectedWith(
       Error,
       "ENOENT: no such file or directory, open 'sonar-project.properties'"
     );
 
-    expect(output).to.equal(`info: Script "sonar-init" starting...
+    expect(loggerRecorder.recordedLogs).to.equal(`info: Script "sonar-init" starting...
 error: Script "sonar-init" failed after 0 s with: ENOENT: no such file or directory, open 'sonar-project.properties'
 `);
   });
