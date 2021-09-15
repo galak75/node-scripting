@@ -11,6 +11,19 @@ import * as sinon from 'sinon';
 const chai = require('chai');
 chai.use(require('chai-as-promised'));
 
+function getSonarInitScript(shouldAlreadyExist: boolean, logger: {}) : SonarInitScript {
+  return new SonarInitScript({
+    args: {},
+    options: {
+      shouldAlreadyExist
+    },
+    program: sinon.stub() as any,
+    command: sinon.stub() as any,
+    ddash: sinon.stub() as any,
+    logger: logger as any
+  });
+}
+
 describe('Test sonar-init script', function() {
   timeout(this, 30000);
 
@@ -32,16 +45,7 @@ describe('Test sonar-init script', function() {
       }
     );
 
-    const sonarInitScript = new SonarInitScript({
-      args: {},
-      options: {
-        shouldAlreadyExist: false
-      },
-      program: sinon.stub() as any,
-      command: sinon.stub() as any,
-      ddash: sinon.stub() as any,
-      logger: logger as any
-    });
+    const sonarInitScript = getSonarInitScript(false, logger);
 
     await expect(sonarInitScript.run()).to.be.rejectedWith(
       Error,
