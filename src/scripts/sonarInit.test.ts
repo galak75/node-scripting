@@ -3,44 +3,49 @@
 // tslint:disable:no-console
 // ==========================================
 import { describe, it } from 'mocha';
-import { assert } from 'chai';
-import { containsText, timeout } from '../utils/testingUtils';
+import { assert, expect } from 'chai';
+import { containsText, setTestingConfigs, timeout } from '../utils/testingUtils';
 import { run } from '../run';
 import { Program } from '@caporal/core';
 import { SonarInitScript } from './sonarInit';
 import * as sinon from 'sinon';
 
+const chai = require('chai');
+chai.use(require('chai-as-promised'));
+
 let caporal: Program;
 
-describe('Test sonar-init script', function () {
+describe('Test sonar-init script', function() {
   timeout(this, 30000);
+
+  before(() => {
+    setTestingConfigs();
+  });
 
   beforeEach(() => {
     caporal = require('@caporal/core').program;
-  })
+  });
 
   const scriptUnderTest = new SonarInitScript({
     args: {},
     ddash: [],
-    options: {shouldAlreadyExist: false},
+    options: { shouldAlreadyExist: false },
     program: caporal,
     // command: contextual command if any??,
     logger: undefined
   });
 
-  it(` should fail when sonar-project.properties is missing`, async () => {
-
+  it.skip(` should fail when sonar-project.properties is missing`, async () => {
     await scriptUnderTest.run();
 
     const expectedOutput = `info: Script "sonar-init" starting...
 
 error: Script "sonar-init" failed after 0 s with: ENOENT: no such file or directory, open 'sonar-project.properties'
 `;
-    assert.isTrue(containsText("FAIL", expectedOutput));
+    assert.isTrue(containsText('FAIL', expectedOutput));
   });
 
-  it(` should still fail when sonar-project.properties is missing`, async () => {
-
+  it.skip(` should still fail when sonar-project.properties is missing`, async () => {
     await run({
       caporal,
       projectRoot: __dirname,
@@ -52,26 +57,24 @@ error: Script "sonar-init" failed after 0 s with: ENOENT: no such file or direct
 
 error: Script "sonar-init" failed after 0 s with: ENOENT: no such file or directory, open 'sonar-project.properties'
 `;
-    assert.isTrue(containsText("FAIL", expectedOutput));
+    assert.isTrue(containsText('FAIL', expectedOutput));
   });
 
-  it.only(` should really fail when sonar-project.properties is missing`, async () => {
+  it(` should really fail when sonar-project.properties is missing`, async () => {
     let output = '';
     const logger = new Proxy(
       {},
       {
         get: (target, prop) => {
           // tslint:disable-next-line: only-arrow-functions
-          return function () {
-            if (prop === 'info') {
-              output += arguments[0] + '\n';
-            }
+          return function() {
+            output += `${prop.toString()}: ${arguments[0]}\n`;
           };
         }
       }
     );
 
-    await new SonarInitScript({
+    const sonarInitScript = new SonarInitScript({
       args: {},
       options: {
         shouldAlreadyExist: false
@@ -80,10 +83,17 @@ error: Script "sonar-init" failed after 0 s with: ENOENT: no such file or direct
       command: sinon.stub() as any,
       ddash: sinon.stub() as any,
       logger: logger as any
-    }).run();
+    });
 
-    assert.isTrue(output.indexOf(`port: 789`) > -1);
+    await expect(sonarInitScript.run()).to.be.rejectedWith(
+      Error,
+      "ENOENT: no such file or directory, open 'sonar-project.properties'"
+    );
 
-  })
+    const expectedOutput = `info: Script "sonar-init" starting...
+error: Script "sonar-init" failed after 0 s with: ENOENT: no such file or directory, open 'sonar-project.properties'
+`;
 
-})
+    expect(output).to.equal(expectedOutput);
+  });
+});
