@@ -48,10 +48,8 @@ describe('Test sonar-init script', function() {
       "ENOENT: no such file or directory, open 'sonar-project.properties'"
     );
 
-    const expectedOutput = `info: Script "sonar-init" starting...
+    expect(output).to.equal(`info: Script "sonar-init" starting...
 error: Script "sonar-init" failed after 0 s with: ENOENT: no such file or directory, open 'sonar-project.properties'
-`;
-
-    expect(output).to.equal(expectedOutput);
+`);
   });
 });
