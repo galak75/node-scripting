@@ -122,6 +122,7 @@ info: Script "sonar-init" successful after 0 s
 
       assert.isTrue(nock.isDone(), `There are remaining expected HTTP calls: ${nock.pendingMocks().toString()}`);
 
+      // TODO Geraud : review the expected output below:
       const expectedOutput = `info: Script "sonar-init" starting...
 info: Initializing 'my-test-project-key' Sonar project...
 debug: *** Calling Sonar API to check whether my-test-project-key project exists in https://example.com/sonar/ Sonar instance...
@@ -130,6 +131,8 @@ warn: 'my-test-project-key' Sonar project already exists at https://example.com/
 info: Script "sonar-init" successful after 0 s
 `;
       expect(loggerRecorder.recordedLogs).to.equal(expectedOutput);
+
+      // TODO Geraud : add assertions on expected calls to sonarInitScript.invokeShellCommand
     });
 
   });
