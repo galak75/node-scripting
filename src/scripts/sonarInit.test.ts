@@ -80,7 +80,7 @@ error: Script "sonar-init" failed after 0 s with: ENOENT: no such file or direct
       nock.cleanAll();
     });
 
-    it(` should do something`, async () => {
+    it(` should skip sonar project initialization with a warning when it does already exist.`, async () => {
       nock('https://example.com')
       .get('/sonar/api/project_branches/list')
       .query({ project: 'my-test-project-key' })
@@ -93,17 +93,14 @@ error: Script "sonar-init" failed after 0 s with: ENOENT: no such file or direct
 
       await sonarInitScript.run();
 
-      // TODO Geraud : NOT YET IMPLEMENTED
-
-      console.log('***** Pending mocks *****');
-      console.log(nock.pendingMocks());
-      console.log('*************************');
-
       assert.isTrue(nock.isDone(), `There are remaining expected HTTP calls: ${nock.pendingMocks().toString()}`);
 
       const expectedOutput = `info: Script "sonar-init" starting...
 info: Initializing 'my-test-project-key' Sonar project...
-Blah Blah Blah
+debug: *** Calling Sonar API to check whether my-test-project-key project exists in https://example.com/sonar/ Sonar instance...
+debug: *** Sonar API response :
+warn: 'my-test-project-key' Sonar project already exists at https://example.com/sonar/dashboard?id=my-test-project-key ! Skipping sonar initialization...
+info: Script "sonar-init" successful after 0 s
 `;
       expect(loggerRecorder.recordedLogs).to.equal(expectedOutput);
     });
