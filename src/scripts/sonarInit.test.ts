@@ -104,6 +104,34 @@ info: Script "sonar-init" successful after 0 s
 `;
       expect(loggerRecorder.recordedLogs).to.equal(expectedOutput);
     });
+
+    it(` should initialize sonar project when it does not yet exist.`, async () => {
+      nock('https://example.com')
+      .get('/sonar/api/project_branches/list')
+      .query({ project: 'my-test-project-key' })
+      .reply(404);
+
+      const loggerRecorder = new LoggerRecorder();
+      const sonarInitScript = getSonarInitScript(false, loggerRecorder.logger);
+
+      // TODO Geraud : mock sonarInitScript.invokeShellCommand to avoid actual external calls to 'sonar-scanner'
+
+      console.log('***** Launching sonar-init script in unit test *****');
+
+      await sonarInitScript.run();
+
+      assert.isTrue(nock.isDone(), `There are remaining expected HTTP calls: ${nock.pendingMocks().toString()}`);
+
+      const expectedOutput = `info: Script "sonar-init" starting...
+info: Initializing 'my-test-project-key' Sonar project...
+debug: *** Calling Sonar API to check whether my-test-project-key project exists in https://example.com/sonar/ Sonar instance...
+debug: *** Sonar API response :
+warn: 'my-test-project-key' Sonar project already exists at https://example.com/sonar/dashboard?id=my-test-project-key ! Skipping sonar initialization...
+info: Script "sonar-init" successful after 0 s
+`;
+      expect(loggerRecorder.recordedLogs).to.equal(expectedOutput);
+    });
+
   });
 
 });
