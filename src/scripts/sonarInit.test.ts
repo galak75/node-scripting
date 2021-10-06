@@ -90,13 +90,14 @@ error: Script "sonar-init" failed after 0 s with: ENOENT: no such file or direct
     it(` should skip sonar project initialization with a warning when it does already exist.`, async () => {
       nock('https://example.com')
       .get('/sonar/api/project_branches/list')
-      .query({ project: 'my-test-project-key' })
+      .query({project: 'my-test-project-key'})
       .reply(200);
+
+      // @ts-ignore
+      const shellCommand = sandbox.spy(SonarInitScript.prototype, 'invokeShellCommand');
 
       const loggerRecorder = new LoggerRecorder();
       const sonarInitScript = getSonarInitScript(false, loggerRecorder.logger);
-
-      console.log('***** Launching sonar-init script in unit test *****');
 
       await sonarInitScript.run();
 
@@ -110,6 +111,10 @@ warn: 'my-test-project-key' Sonar project already exists at https://example.com/
 info: Script "sonar-init" successful after 0 s
 `;
       expect(loggerRecorder.recordedLogs).to.equal(expectedOutput);
+
+      // @ts-ignore
+      // tslint:disable-next-line:no-unused-expression
+      shellCommand.should.not.have.been.called;
     });
 
     it(` should initialize sonar project when it does not yet exist.`, async () => {
