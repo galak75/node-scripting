@@ -8,12 +8,17 @@ import { setTestingConfigs, timeout } from '../utils/testingUtils';
 import { SonarInitScript } from './sonarInit';
 import * as sinon from 'sinon';
 import * as fs from 'fs-extra';
+
 const nock = require('nock');
 
 const chai = require('chai');
+chai.should();
 chai.use(require('chai-as-promised'));
+chai.use(require("sinon-chai"));
 
-function getSonarInitScript(shouldAlreadyExist: boolean, logger: {}) : SonarInitScript {
+const sandbox = sinon.createSandbox();
+
+function getSonarInitScript(shouldAlreadyExist: boolean, logger: {}): SonarInitScript {
   return new SonarInitScript({
     args: {},
     options: {
@@ -29,6 +34,7 @@ function getSonarInitScript(shouldAlreadyExist: boolean, logger: {}) : SonarInit
 class LoggerRecorder {
   logger: {};
   recordedLogs: string;
+
   constructor() {
     this.recordedLogs = '';
     // tslint:disable-next-line:no-this-assignment
@@ -38,7 +44,7 @@ class LoggerRecorder {
       {
         get: (target, prop) => {
           // tslint:disable-next-line: only-arrow-functions
-          return function() {
+          return function () {
             that.recordedLogs += `${prop.toString()}: ${arguments[0]}\n`;
           };
         }
@@ -47,7 +53,7 @@ class LoggerRecorder {
   }
 }
 
-describe.only('Test sonar-init script', function() {
+describe.only('sonar-init script', function () {
   timeout(this, 30000);
 
   before(() => {
@@ -78,6 +84,7 @@ error: Script "sonar-init" failed after 0 s with: ENOENT: no such file or direct
 
     afterEach(() => {
       nock.cleanAll();
+      sandbox.restore();
     });
 
     it(` should skip sonar project initialization with a warning when it does already exist.`, async () => {
@@ -108,31 +115,33 @@ info: Script "sonar-init" successful after 0 s
     it(` should initialize sonar project when it does not yet exist.`, async () => {
       nock('https://example.com')
       .get('/sonar/api/project_branches/list')
-      .query({ project: 'my-test-project-key' })
+      .query({project: 'my-test-project-key'})
       .reply(404);
+
+      // @ts-ignore
+      const shellCommand = sandbox.stub(SonarInitScript.prototype, 'invokeShellCommand').returns(Promise.resolve(0));
 
       const loggerRecorder = new LoggerRecorder();
       const sonarInitScript = getSonarInitScript(false, loggerRecorder.logger);
-
-      // TODO Geraud : mock sonarInitScript.invokeShellCommand to avoid actual external calls to 'sonar-scanner'
-
-      console.log('***** Launching sonar-init script in unit test *****');
 
       await sonarInitScript.run();
 
       assert.isTrue(nock.isDone(), `There are remaining expected HTTP calls: ${nock.pendingMocks().toString()}`);
 
-      // TODO Geraud : review the expected output below:
       const expectedOutput = `info: Script "sonar-init" starting...
 info: Initializing 'my-test-project-key' Sonar project...
 debug: *** Calling Sonar API to check whether my-test-project-key project exists in https://example.com/sonar/ Sonar instance...
 debug: *** Sonar API response :
-warn: 'my-test-project-key' Sonar project already exists at https://example.com/sonar/dashboard?id=my-test-project-key ! Skipping sonar initialization...
+info: 'my-test-project-key' Sonar project successfully initialized, and available at https://example.com/sonar/dashboard?id=my-test-project-key
 info: Script "sonar-init" successful after 0 s
 `;
       expect(loggerRecorder.recordedLogs).to.equal(expectedOutput);
 
-      // TODO Geraud : add assertions on expected calls to sonarInitScript.invokeShellCommand
+      // @ts-ignore
+      // tslint:disable-next-line:no-unused-expression
+      shellCommand.should.have.been.calledTwice;
+      shellCommand.should.have.been.calledWithExactly('./node_modules/.bin/sonar-scanner', []);
+      shellCommand.should.have.been.calledWithExactly('./node_modules/.bin/sonar-scanner', ['-Dsonar.branch.name=develop']);
     });
 
   });
