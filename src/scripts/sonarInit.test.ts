@@ -53,6 +53,20 @@ class LoggerRecorder {
   }
 }
 
+function simulateSonarProjectDoesNotYetExist() {
+  nock('https://example.com')
+  .get('/sonar/api/project_branches/list')
+  .query({project: 'my-test-project-key'})
+  .reply(404);
+}
+
+function simulateSonarProjectAlreadyExists() {
+  nock('https://example.com')
+  .get('/sonar/api/project_branches/list')
+  .query({project: 'my-test-project-key'})
+  .reply(200);
+}
+
 describe.only('sonar-init script', function () {
   timeout(this, 30000);
 
@@ -88,10 +102,7 @@ error: Script "sonar-init" failed after 0 s with: ENOENT: no such file or direct
     });
 
     it(` should skip sonar project initialization with a warning when it does already exist.`, async () => {
-      nock('https://example.com')
-      .get('/sonar/api/project_branches/list')
-      .query({project: 'my-test-project-key'})
-      .reply(200);
+      simulateSonarProjectAlreadyExists();
 
       // @ts-ignore
       const shellCommand = sandbox.spy(SonarInitScript.prototype, 'invokeShellCommand');
@@ -118,10 +129,7 @@ info: Script "sonar-init" successful after 0 s
     });
 
     it(` should initialize sonar project when it does not yet exist.`, async () => {
-      nock('https://example.com')
-      .get('/sonar/api/project_branches/list')
-      .query({project: 'my-test-project-key'})
-      .reply(404);
+      simulateSonarProjectDoesNotYetExist();
 
       // @ts-ignore
       const shellCommand = sandbox.stub(SonarInitScript.prototype, 'invokeShellCommand').returns(Promise.resolve(0));
