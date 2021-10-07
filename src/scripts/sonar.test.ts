@@ -144,7 +144,7 @@ error: Script "sonar" failed after 0 s with: ENOENT: no such file or directory, 
       // tslint:disable-next-line:no-unused-expression
       shellCommand.should.have.been.calledTwice;
       shellCommand.should.have.been.calledWith('git', ['branch', '--show-current']);
-      shellCommand.should.have.been.calledWith(SONAR_SCANNER, ['-Dsonar.branch.name=current-local-branch', '-Dsonar.branch.target=develop']);
+      shellCommand.should.have.been.calledWithExactly(SONAR_SCANNER, ['-Dsonar.branch.name=current-local-branch', '-Dsonar.branch.target=develop']);
     });
 
     // TODO Geraud : add more test cases:
