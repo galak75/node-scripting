@@ -89,6 +89,8 @@ error: Script "sonar-init" failed after 0 s with: ENOENT: no such file or direct
   });
 
   describe(' with valid sonar-project.properties file', async () => {
+    let sonarProjectShouldExist:boolean = false;
+
     before(async () => {
       await fs.copyFile('./src/utils/test-sonar-project.properties', './sonar-project.properties');
     });
@@ -101,61 +103,67 @@ error: Script "sonar-init" failed after 0 s with: ENOENT: no such file or direct
       sandbox.restore();
     });
 
-    it(` should skip sonar project initialization with a warning when it does already exist.`, async () => {
-      assumeSonarProjectAlreadyExists();
+    describe(' given that sonar project is not expected to exist yet', async () => {
+      before(() => {
+        sonarProjectShouldExist = false;
+      });
 
-      // @ts-ignore
-      const shellCommand = sandbox.spy(SonarInitScript.prototype, 'invokeShellCommand');
+      it(` should skip sonar project initialization with a warning when it does already exist.`, async () => {
+        assumeSonarProjectAlreadyExists();
 
-      const loggerRecorder = new LoggerRecorder();
-      const sonarInitScript = getSonarInitScript(false, loggerRecorder.logger);
+        // @ts-ignore
+        const shellCommand = sandbox.spy(SonarInitScript.prototype, 'invokeShellCommand');
 
-      await sonarInitScript.run();
+        const loggerRecorder = new LoggerRecorder();
+        const sonarInitScript = getSonarInitScript(sonarProjectShouldExist, loggerRecorder.logger);
 
-      assert.isTrue(nock.isDone(), `There are remaining expected HTTP calls: ${nock.pendingMocks().toString()}`);
+        await sonarInitScript.run();
 
-      const expectedOutput = `info: Script "sonar-init" starting...
+        assert.isTrue(nock.isDone(), `There are remaining expected HTTP calls: ${nock.pendingMocks().toString()}`);
+
+        const expectedOutput = `info: Script "sonar-init" starting...
 info: Initializing 'my-test-project-key' Sonar project...
 debug: *** Calling Sonar API to check whether my-test-project-key project exists in https://example.com/sonar/ Sonar instance...
 debug: *** Sonar API response :
 warn: 'my-test-project-key' Sonar project already exists at https://example.com/sonar/dashboard?id=my-test-project-key ! Skipping sonar initialization...
 info: Script "sonar-init" successful after 0 s
 `;
-      expect(loggerRecorder.recordedLogs).to.equal(expectedOutput);
+        expect(loggerRecorder.recordedLogs).to.equal(expectedOutput);
 
-      // @ts-ignore
-      // tslint:disable-next-line:no-unused-expression
-      shellCommand.should.not.have.been.called;
-    });
+        // @ts-ignore
+        // tslint:disable-next-line:no-unused-expression
+        shellCommand.should.not.have.been.called;
+      });
 
-    it(` should initialize sonar project when it does not yet exist.`, async () => {
-      assumeSonarProjectDoesNotYetExist();
+      it(` should initialize sonar project when it does not yet exist.`, async () => {
+        assumeSonarProjectDoesNotYetExist();
 
-      // @ts-ignore
-      const shellCommand = sandbox.stub(SonarInitScript.prototype, 'invokeShellCommand').returns(Promise.resolve(0));
+        // @ts-ignore
+        const shellCommand = sandbox.stub(SonarInitScript.prototype, 'invokeShellCommand').returns(Promise.resolve(0));
 
-      const loggerRecorder = new LoggerRecorder();
-      const sonarInitScript = getSonarInitScript(false, loggerRecorder.logger);
+        const loggerRecorder = new LoggerRecorder();
+        const sonarInitScript = getSonarInitScript(sonarProjectShouldExist, loggerRecorder.logger);
 
-      await sonarInitScript.run();
+        await sonarInitScript.run();
 
-      assert.isTrue(nock.isDone(), `There are remaining expected HTTP calls: ${nock.pendingMocks().toString()}`);
+        assert.isTrue(nock.isDone(), `There are remaining expected HTTP calls: ${nock.pendingMocks().toString()}`);
 
-      const expectedOutput = `info: Script "sonar-init" starting...
+        const expectedOutput = `info: Script "sonar-init" starting...
 info: Initializing 'my-test-project-key' Sonar project...
 debug: *** Calling Sonar API to check whether my-test-project-key project exists in https://example.com/sonar/ Sonar instance...
 debug: *** Sonar API response :
 info: 'my-test-project-key' Sonar project successfully initialized, and available at https://example.com/sonar/dashboard?id=my-test-project-key
 info: Script "sonar-init" successful after 0 s
 `;
-      expect(loggerRecorder.recordedLogs).to.equal(expectedOutput);
+        expect(loggerRecorder.recordedLogs).to.equal(expectedOutput);
 
-      // @ts-ignore
-      // tslint:disable-next-line:no-unused-expression
-      shellCommand.should.have.been.calledTwice;
-      shellCommand.should.have.been.calledWithExactly('./node_modules/.bin/sonar-scanner', []);
-      shellCommand.should.have.been.calledWithExactly('./node_modules/.bin/sonar-scanner', ['-Dsonar.branch.name=develop']);
-    });
+        // @ts-ignore
+        // tslint:disable-next-line:no-unused-expression
+        shellCommand.should.have.been.calledTwice;
+        shellCommand.should.have.been.calledWithExactly('./node_modules/.bin/sonar-scanner', []);
+        shellCommand.should.have.been.calledWithExactly('./node_modules/.bin/sonar-scanner', ['-Dsonar.branch.name=develop']);
+      });
+    })
 
   });
 
