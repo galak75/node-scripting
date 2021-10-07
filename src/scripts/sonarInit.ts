@@ -4,8 +4,6 @@ import { SONAR_SCANNER } from './sonar';
 import { SonarBaseScript } from './sonarBase';
 import { IGlobalOptions } from '../globalOptions';
 
-const properties = require('java-properties');
-
 export interface Options extends IGlobalOptions {
   shouldAlreadyExist?: boolean;
 }
@@ -28,9 +26,7 @@ export class SonarInitScript extends SonarBaseScript<Options> {
   }
 
   protected async main() {
-    const sonarProperties = properties.of('sonar-project.properties');
-    const sonarHostUrl = sonarProperties.get('sonar.host.url');
-    const sonarProjectKey = sonarProperties.get('sonar.projectKey');
+    const {sonarHostUrl, sonarProjectKey} = this.getSonarProjectInformation();
 
     this.logScriptStart(sonarProjectKey);
 

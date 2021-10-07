@@ -2,6 +2,13 @@ import { ScriptBase } from '../scriptBase';
 import * as request from 'superagent';
 import { URL } from 'url';
 
+const properties = require('java-properties');
+
+export interface SonarProjectInformation {
+  sonarHostUrl: string,
+  sonarProjectKey: string
+}
+
 export abstract class SonarBaseScript<Options> extends ScriptBase<Options> {
 
   protected async sonarProjectAlreadyExists(sonarProjectKey: string, sonarHostUrl: string): Promise<boolean> {
@@ -35,5 +42,13 @@ export abstract class SonarBaseScript<Options> extends ScriptBase<Options> {
     }
 
     throw {msg: 'Unexpected response from Sonar API!', response: res};
+  }
+
+  protected getSonarProjectInformation(): SonarProjectInformation {
+    const sonarProperties = properties.of('sonar-project.properties');
+    return {
+      sonarHostUrl: sonarProperties.get('sonar.host.url'),
+      sonarProjectKey: sonarProperties.get('sonar.projectKey')
+    };
   }
 }
