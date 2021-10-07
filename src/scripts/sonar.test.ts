@@ -130,6 +130,11 @@ error: Script "sonar" failed after 0 s with: ENOENT: no such file or directory, 
       expect(loggerRecorder.recordedLogs).to.contain(
         "info: Analyzing current branch source code...");
 
+      // TODO Geraud : improve assertion on logged messages
+      // console.log("************************");
+      // console.log(loggerRecorder.recordedLogs);
+      // console.log("************************");
+
       // sonar-init script should not have been called
       // @ts-ignore
       // tslint:disable-next-line:no-unused-expression
@@ -141,6 +146,12 @@ error: Script "sonar" failed after 0 s with: ENOENT: no such file or directory, 
       shellCommand.should.have.been.calledWith('git', ['branch', '--show-current']);
       shellCommand.should.have.been.calledWith(SONAR_SCANNER, ['-Dsonar.branch.name=current-local-branch', '-Dsonar.branch.target=develop']);
     });
+
+    // TODO Geraud : add more test cases:
+    //               - when git branch fails
+    //               - when passing no target branch
+    //               - when sonar project does not yet exists
+
   });
 
 });
