@@ -9,7 +9,8 @@ import { setTestingConfigs, timeout } from '../utils/testingUtils';
 import { SonarScript } from './sonar';
 import * as sinon from 'sinon';
 import * as fs from 'fs-extra';
-import { SonarInitScript } from './sonarInit';
+
+const nock = require('nock');
 
 const chai = require('chai');
 chai.should();
@@ -53,6 +54,20 @@ class LoggerRecorder {
   }
 }
 
+// function simulateSonarProjectDoesNotYetExist() {
+//   nock('https://example.com')
+//   .get('/sonar/api/project_branches/list')
+//   .query({project: 'my-test-project-key'})
+//   .reply(404);
+// }
+
+function simulateSonarProjectAlreadyExists() {
+  nock('https://example.com')
+  .get('/sonar/api/project_branches/list')
+  .query({project: 'my-test-project-key'})
+  .reply(200);
+}
+
 describe('sonar script', function () {
   timeout(this, 30000);
 
@@ -70,9 +85,7 @@ describe('sonar script', function () {
     );
 
     expect(loggerRecorder.recordedLogs).to.equal(`info: Script "sonar" starting...
-info: Script "sonar-init" starting...
-error: Script "sonar-init" failed after 0 s with: ENOENT: no such file or directory, open 'sonar-project.properties'
-warn: Script "sonar" was aborted after 0 s
+error: Script "sonar" failed after 0 s with: ENOENT: no such file or directory, open 'sonar-project.properties'
 `);
   });
 
@@ -86,9 +99,11 @@ warn: Script "sonar" was aborted after 0 s
 
     afterEach(() => {
       sandbox.restore();
+      nock.cleanAll();
     });
 
-    it(` should skip sonar project initialization with a warning when it does already exist.`, async () => {
+    it(` should successfully analyze code when project already exists in Sonar.`, async () => {
+      simulateSonarProjectAlreadyExists();
 
       // @ts-ignore
       const shellCommand = sandbox.stub(SonarScript.prototype, 'invokeShellCommand');
@@ -96,8 +111,6 @@ warn: Script "sonar" was aborted after 0 s
       shellCommand.returns(Promise.resolve(0))
       // @ts-ignore
       const subScript = sandbox.stub(SonarScript.prototype, 'invokeScript');
-      // Invoked subscript will succeed
-      subScript.returns(Promise.resolve());
 
       const loggerRecorder = new LoggerRecorder();
       const sonarScript = getSonarScript('develop', loggerRecorder.logger);
@@ -107,10 +120,10 @@ warn: Script "sonar" was aborted after 0 s
       expect(loggerRecorder.recordedLogs).to.contain(
         "info: Analyzing current branch source code...");
 
+      // sonar-init script should not have been called
       // @ts-ignore
       // tslint:disable-next-line:no-unused-expression
-      subScript.should.have.been.calledOnce;
-      subScript.should.have.been.calledWithExactly(SonarInitScript, { shouldAlreadyExist: true }, {});
+      subScript.should.not.have.been.called;
 
       // @ts-ignore
       // tslint:disable-next-line:no-unused-expression
