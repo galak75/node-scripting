@@ -1,7 +1,7 @@
 import { Command } from '@caporal/core';
 import { SonarInitScript } from './sonarInit';
 import { IGlobalOptions } from '../globalOptions';
-import { ScriptBase } from '../scriptBase';
+import { SonarBaseScript } from './sonarBase';
 
 export const SONAR_SCANNER = './node_modules/.bin/sonar-scanner';
 
@@ -9,7 +9,7 @@ export interface Options extends IGlobalOptions {
   targetBranch?: string;
 }
 
-export class SonarScript extends ScriptBase<Options> {
+export class SonarScript extends SonarBaseScript<Options> {
   get name(): string {
     return 'sonar';
   }
