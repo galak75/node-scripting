@@ -28,8 +28,14 @@ export class SonarScript extends SonarBaseScript<Options> {
   }
 
   protected async main() {
-    // TODO Geraud : check first if project already exist
-    await this.invokeScript(SonarInitScript, {}, {});
+    const {sonarHostUrl, sonarProjectKey} = this.getSonarProjectInformation();
+    //
+    // this.logScriptStart(sonarProjectKey);
+
+    if (! await this.sonarProjectAlreadyExists(sonarProjectKey, sonarHostUrl)) {
+      // TODO Geraud : log a warning message
+      await this.invokeScript(SonarInitScript, {}, {});
+    }
 
     this.logger.info(`Analyzing current branch source code...`);
     // npx sonar-scanner -Dsonar.branch.name=`git branch --show-current` -Dsonar.branch.target=develop
