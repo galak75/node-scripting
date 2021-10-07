@@ -19,12 +19,10 @@ chai.use(require("sinon-chai"));
 
 const sandbox = sinon.createSandbox();
 
-function getSonarInitScript(shouldAlreadyExist: boolean, logger: {}): SonarInitScript {
+function getSonarInitScript(logger: {}): SonarInitScript {
   return new SonarInitScript({
     args: {},
-    options: {
-      shouldAlreadyExist
-    },
+    options: {},
     program: sinon.stub() as any,
     command: sinon.stub() as any,
     ddash: sinon.stub() as any,
@@ -77,7 +75,7 @@ describe('sonar-init script', function () {
 
   it(` should fail when sonar-project.properties is missing`, async () => {
     const loggerRecorder = new LoggerRecorder();
-    const sonarInitScript = getSonarInitScript(false, loggerRecorder.logger);
+    const sonarInitScript = getSonarInitScript(loggerRecorder.logger);
 
     await expect(sonarInitScript.run()).to.be.rejectedWith(
       Error,
@@ -90,8 +88,6 @@ error: Script "sonar-init" failed after 0 s with: ENOENT: no such file or direct
   });
 
   describe(' with valid sonar-project.properties file', async () => {
-    let sonarProjectShouldExist: boolean = false;
-
     before(async () => {
       await fs.copyFile('./src/utils/test-sonar-project.properties', './sonar-project.properties');
     });
@@ -104,129 +100,58 @@ error: Script "sonar-init" failed after 0 s with: ENOENT: no such file or direct
       sandbox.restore();
     });
 
-    describe(' given that sonar project is not expected to exist yet', async () => {
-      before(() => {
-        sonarProjectShouldExist = false;
-      });
+    it(` should skip sonar project initialization with a warning when it does already exist.`, async () => {
+      simulateSonarProjectAlreadyExists();
 
-      it(` should skip sonar project initialization with a warning when it does already exist.`, async () => {
-        simulateSonarProjectAlreadyExists();
+      // @ts-ignore
+      const shellCommand = sandbox.spy(SonarInitScript.prototype, 'invokeShellCommand');
 
-        // @ts-ignore
-        const shellCommand = sandbox.spy(SonarInitScript.prototype, 'invokeShellCommand');
+      const loggerRecorder = new LoggerRecorder();
+      const sonarInitScript = getSonarInitScript(loggerRecorder.logger);
 
-        const loggerRecorder = new LoggerRecorder();
-        const sonarInitScript = getSonarInitScript(sonarProjectShouldExist, loggerRecorder.logger);
+      await sonarInitScript.run();
 
-        await sonarInitScript.run();
+      assert.isTrue(nock.isDone(), `There are remaining expected HTTP calls: ${nock.pendingMocks().toString()}`);
 
-        assert.isTrue(nock.isDone(), `There are remaining expected HTTP calls: ${nock.pendingMocks().toString()}`);
-
-        // Expected action is to initialize a new Sonar project
-        expect(loggerRecorder.recordedLogs).to.satisfy(
-          (logs: string) => logs.startsWith(`info: Script "sonar-init" starting...
+      expect(loggerRecorder.recordedLogs).to.satisfy(
+        (logs: string) => logs.startsWith(`info: Script "sonar-init" starting...
 info: Initializing 'my-test-project-key' Sonar project...`
-          ));
-        expect(loggerRecorder.recordedLogs).to.contain(
-          "warn: 'my-test-project-key' Sonar project already exists at https://example.com/sonar/dashboard?id=my-test-project-key ! Skipping sonar initialization...");
+        ));
+      expect(loggerRecorder.recordedLogs).to.contain(
+        "warn: 'my-test-project-key' Sonar project already exists at https://example.com/sonar/dashboard?id=my-test-project-key ! Skipping sonar initialization...");
 
-        // @ts-ignore
-        // tslint:disable-next-line:no-unused-expression
-        shellCommand.should.not.have.been.called;
-      });
-
-      it(` should initialize sonar project when it does not yet exist.`, async () => {
-        simulateSonarProjectDoesNotYetExist();
-
-        // @ts-ignore
-        const shellCommand = sandbox.stub(SonarInitScript.prototype, 'invokeShellCommand').returns(Promise.resolve(0));
-
-        const loggerRecorder = new LoggerRecorder();
-        const sonarInitScript = getSonarInitScript(sonarProjectShouldExist, loggerRecorder.logger);
-
-        await sonarInitScript.run();
-
-        assert.isTrue(nock.isDone(), `There are remaining expected HTTP calls: ${nock.pendingMocks().toString()}`);
-
-        // Expected action is to initialize a new Sonar project
-        expect(loggerRecorder.recordedLogs).to.satisfy(
-          (logs: string) => logs.startsWith(`info: Script "sonar-init" starting...
-info: Initializing 'my-test-project-key' Sonar project...`
-          ));
-        expect(loggerRecorder.recordedLogs).to.contain("info: 'my-test-project-key' Sonar project successfully initialized, and available at https://example.com/sonar/dashboard?id=my-test-project-key")
-        expect(loggerRecorder.recordedLogs).to.not.contain("warn");
-
-        // @ts-ignore
-        // tslint:disable-next-line:no-unused-expression
-        shellCommand.should.have.been.calledTwice;
-        shellCommand.should.have.been.calledWithExactly('./node_modules/.bin/sonar-scanner', []);
-        shellCommand.should.have.been.calledWithExactly('./node_modules/.bin/sonar-scanner', ['-Dsonar.branch.name=develop']);
-      });
+      // @ts-ignore
+      // tslint:disable-next-line:no-unused-expression
+      shellCommand.should.not.have.been.called;
     });
 
-    describe(' given that sonar project is expected to already exist', async () => {
-      before(() => {
-        sonarProjectShouldExist = true;
-      });
+    it(` should initialize sonar project when it does not yet exist.`, async () => {
+      simulateSonarProjectDoesNotYetExist();
 
-      it(` should skip sonar project initialization without any warning when it does already exist.`, async () => {
-        simulateSonarProjectAlreadyExists();
+      // @ts-ignore
+      const shellCommand = sandbox.stub(SonarInitScript.prototype, 'invokeShellCommand').returns(Promise.resolve(0));
 
-        // @ts-ignore
-        const shellCommand = sandbox.spy(SonarInitScript.prototype, 'invokeShellCommand');
+      const loggerRecorder = new LoggerRecorder();
+      const sonarInitScript = getSonarInitScript(loggerRecorder.logger);
 
-        const loggerRecorder = new LoggerRecorder();
-        const sonarInitScript = getSonarInitScript(sonarProjectShouldExist, loggerRecorder.logger);
+      await sonarInitScript.run();
 
-        await sonarInitScript.run();
+      assert.isTrue(nock.isDone(), `There are remaining expected HTTP calls: ${nock.pendingMocks().toString()}`);
 
-        assert.isTrue(nock.isDone(), `There are remaining expected HTTP calls: ${nock.pendingMocks().toString()}`);
+      // Expected action is to initialize a new Sonar project
+      expect(loggerRecorder.recordedLogs).to.satisfy(
+        (logs: string) => logs.startsWith(`info: Script "sonar-init" starting...
+info: Initializing 'my-test-project-key' Sonar project...`
+        ));
+      expect(loggerRecorder.recordedLogs).to.contain("info: 'my-test-project-key' Sonar project successfully initialized, and available at https://example.com/sonar/dashboard?id=my-test-project-key")
+      expect(loggerRecorder.recordedLogs).to.not.contain("warn");
 
-        // Expected action is to check Sonar project already exists
-        expect(loggerRecorder.recordedLogs).to.satisfy(
-          (logs: string) => logs.startsWith(`info: Script "sonar-init" starting...
-info: Checking 'my-test-project-key' Sonar project already exists...`
-          ));
-        expect(loggerRecorder.recordedLogs).to.contain(
-          "info: 'my-test-project-key' Sonar project exists at https://example.com/sonar/dashboard?id=my-test-project-key as expected.");
-        expect(loggerRecorder.recordedLogs).to.not.contain("warn");
-
-        // @ts-ignore
-        // tslint:disable-next-line:no-unused-expression
-        shellCommand.should.not.have.been.called;
-      });
-
-      it(` should initialize sonar project with a warning when it does not yet exist.`, async () => {
-        simulateSonarProjectDoesNotYetExist();
-
-        // @ts-ignore
-        const shellCommand = sandbox.stub(SonarInitScript.prototype, 'invokeShellCommand').returns(Promise.resolve(0));
-
-        const loggerRecorder = new LoggerRecorder();
-        const sonarInitScript = getSonarInitScript(sonarProjectShouldExist, loggerRecorder.logger);
-
-        await sonarInitScript.run();
-
-        assert.isTrue(nock.isDone(), `There are remaining expected HTTP calls: ${nock.pendingMocks().toString()}`);
-
-        // Expected action is to check Sonar project already exists
-        expect(loggerRecorder.recordedLogs).to.satisfy(
-          (logs: string) => logs.startsWith(`info: Script "sonar-init" starting...
-info: Checking 'my-test-project-key' Sonar project already exists...`
-          ));
-        expect(loggerRecorder.recordedLogs).to.contain(
-          "warn: 'my-test-project-key' Sonar project does not yet exist! Initializing it...");
-        expect(loggerRecorder.recordedLogs).to.contain(
-          "info: 'my-test-project-key' Sonar project successfully initialized, and available at https://example.com/sonar/dashboard?id=my-test-project-key");
-
-        // @ts-ignore
-        // tslint:disable-next-line:no-unused-expression
-        shellCommand.should.have.been.calledTwice;
-        shellCommand.should.have.been.calledWithExactly('./node_modules/.bin/sonar-scanner', []);
-        shellCommand.should.have.been.calledWithExactly('./node_modules/.bin/sonar-scanner', ['-Dsonar.branch.name=develop']);
-      });
+      // @ts-ignore
+      // tslint:disable-next-line:no-unused-expression
+      shellCommand.should.have.been.calledTwice;
+      shellCommand.should.have.been.calledWithExactly('./node_modules/.bin/sonar-scanner', []);
+      shellCommand.should.have.been.calledWithExactly('./node_modules/.bin/sonar-scanner', ['-Dsonar.branch.name=develop']);
     });
-
   });
 
 });

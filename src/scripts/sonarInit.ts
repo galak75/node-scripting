@@ -4,11 +4,7 @@ import { SONAR_SCANNER } from './sonar';
 import { SonarBaseScript } from './sonarBase';
 import { IGlobalOptions } from '../globalOptions';
 
-export interface Options extends IGlobalOptions {
-  shouldAlreadyExist?: boolean;
-}
-
-export class SonarInitScript extends SonarBaseScript<Options> {
+export class SonarInitScript extends SonarBaseScript<IGlobalOptions> {
   get name(): string {
     return 'sonar-init';
   }
@@ -33,7 +29,6 @@ export class SonarInitScript extends SonarBaseScript<Options> {
     if (await this.sonarProjectAlreadyExists(sonarProjectKey, sonarHostUrl)) {
       this.logSonarInitSkip(sonarProjectKey, sonarHostUrl);
     } else {
-      this.logSonarInitStart(sonarProjectKey);
       await this.initSonarProject();
       this.logSonarInitSuccess(sonarProjectKey, sonarHostUrl);
     }
@@ -45,17 +40,7 @@ export class SonarInitScript extends SonarBaseScript<Options> {
   }
 
   private logScriptStart(sonarProjectKey: string) {
-    if (this.options.shouldAlreadyExist) {
-      this.logger.info(`Checking '${sonarProjectKey}' Sonar project already exists...`);
-    } else {
-      this.logger.info(`Initializing '${sonarProjectKey}' Sonar project...`);
-    }
-  }
-
-  private logSonarInitStart(sonarProjectKey: string) {
-    if (this.options.shouldAlreadyExist) {
-      this.logger.warn(`'${sonarProjectKey}' Sonar project does not yet exist! Initializing it...`);
-    }
+    this.logger.info(`Initializing '${sonarProjectKey}' Sonar project...`);
   }
 
   private logSonarInitSuccess(sonarProjectKey: string, sonarHostUrl: string) {
@@ -67,13 +52,9 @@ export class SonarInitScript extends SonarBaseScript<Options> {
 
   private logSonarInitSkip(sonarProjectKey: string, sonarHostUrl: string) {
     const sonarProjectUrl = this.buildSonarProjectUrl(sonarProjectKey, sonarHostUrl);
-    if (this.options.shouldAlreadyExist) {
-      this.logger.info(`'${sonarProjectKey}' Sonar project exists at ${sonarProjectUrl} as expected.`);
-    } else {
-      this.logger.warn(
-        `'${sonarProjectKey}' Sonar project already exists at ${sonarProjectUrl} ! Skipping sonar initialization...`
-      );
-    }
+    this.logger.warn(
+      `'${sonarProjectKey}' Sonar project already exists at ${sonarProjectUrl} ! Skipping sonar initialization...`
+    );
   }
 
   private buildSonarProjectUrl(sonarProjectKey: string, sonarHostUrl: string): URL {
