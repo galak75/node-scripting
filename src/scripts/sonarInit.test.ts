@@ -182,15 +182,6 @@ info: Initializing 'my-test-project-key' Sonar project...`
 
         assert.isTrue(nock.isDone(), `There are remaining expected HTTP calls: ${nock.pendingMocks().toString()}`);
 
-        const expectedOutput = `info: Script "sonar-init" starting...
-info: Checking 'my-test-project-key' Sonar project already exists...
-debug: *** Calling Sonar API to check whether my-test-project-key project exists in https://example.com/sonar/ Sonar instance...
-debug: *** Sonar API response :
-info: 'my-test-project-key' Sonar project exists at https://example.com/sonar/dashboard?id=my-test-project-key as expected.
-info: Script "sonar-init" successful after 0 s
-`;
-        expect(loggerRecorder.recordedLogs).to.equal(expectedOutput);
-
         // Expected action is to check Sonar project already exists
         expect(loggerRecorder.recordedLogs).to.satisfy(
           (logs: string) => logs.startsWith(`info: Script "sonar-init" starting...
@@ -217,16 +208,6 @@ info: Checking 'my-test-project-key' Sonar project already exists...`
         await sonarInitScript.run();
 
         assert.isTrue(nock.isDone(), `There are remaining expected HTTP calls: ${nock.pendingMocks().toString()}`);
-
-        const expectedOutput = `info: Script "sonar-init" starting...
-info: Checking 'my-test-project-key' Sonar project already exists...
-debug: *** Calling Sonar API to check whether my-test-project-key project exists in https://example.com/sonar/ Sonar instance...
-debug: *** Sonar API response :
-warn: 'my-test-project-key' Sonar project does not yet exist! Initializing it...
-info: 'my-test-project-key' Sonar project successfully initialized, and available at https://example.com/sonar/dashboard?id=my-test-project-key
-info: Script "sonar-init" successful after 0 s
-`;
-        expect(loggerRecorder.recordedLogs).to.equal(expectedOutput);
 
         // Expected action is to check Sonar project already exists
         expect(loggerRecorder.recordedLogs).to.satisfy(
