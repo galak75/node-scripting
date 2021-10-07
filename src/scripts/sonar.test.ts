@@ -8,15 +8,15 @@ import { expect } from 'chai';
 import { setTestingConfigs, timeout } from '../utils/testingUtils';
 import { SonarScript } from './sonar';
 import * as sinon from 'sinon';
-
-// const nock = require('nock');
+import * as fs from 'fs-extra';
+import { SonarInitScript } from './sonarInit';
 
 const chai = require('chai');
 chai.should();
 chai.use(require('chai-as-promised'));
 chai.use(require("sinon-chai"));
 
-// const sandbox = sinon.createSandbox();
+const sandbox = sinon.createSandbox();
 
 function getSonarScript(targetBranch: string, logger: {}): SonarScript {
   return new SonarScript({
@@ -74,6 +74,51 @@ info: Script "sonar-init" starting...
 error: Script "sonar-init" failed after 0 s with: ENOENT: no such file or directory, open 'sonar-project.properties'
 warn: Script "sonar" was aborted after 0 s
 `);
+  });
+
+  describe(' with valid sonar-project.properties file', async () => {
+    before(async () => {
+      await fs.copyFile('./src/utils/test-sonar-project.properties', './sonar-project.properties');
+    });
+    after(async () => {
+      await fs.unlink('./sonar-project.properties');
+    });
+
+    afterEach(() => {
+      sandbox.restore();
+    });
+
+    it(` should skip sonar project initialization with a warning when it does already exist.`, async () => {
+
+      // @ts-ignore
+      const shellCommand = sandbox.stub(SonarScript.prototype, 'invokeShellCommand');
+      // All invoked shell commands will succeed
+      shellCommand.returns(Promise.resolve(0))
+      // @ts-ignore
+      const subScript = sandbox.stub(SonarScript.prototype, 'invokeScript');
+      // Invoked subscript will succeed
+      subScript.returns(Promise.resolve());
+
+      const loggerRecorder = new LoggerRecorder();
+      const sonarScript = getSonarScript('develop', loggerRecorder.logger);
+
+      await sonarScript.run();
+
+      expect(loggerRecorder.recordedLogs).to.contain(
+        "info: Analyzing current branch source code...");
+
+      // @ts-ignore
+      // tslint:disable-next-line:no-unused-expression
+      subScript.should.have.been.calledOnce;
+      subScript.should.have.been.calledWithExactly(SonarInitScript, { shouldAlreadyExist: true }, {});
+
+      // @ts-ignore
+      // tslint:disable-next-line:no-unused-expression
+      shellCommand.should.have.been.calledTwice;
+
+      // TODO Geraud : add more precise assertions
+
+    });
   });
 
 });
