@@ -53,7 +53,7 @@ class LoggerRecorder {
   }
 }
 
-describe.only('sonar script', function () {
+describe('sonar script', function () {
   timeout(this, 30000);
 
   before(() => {
