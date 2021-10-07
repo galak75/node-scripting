@@ -90,7 +90,7 @@ error: Script "sonar-init" failed after 0 s with: ENOENT: no such file or direct
   });
 
   describe(' with valid sonar-project.properties file', async () => {
-    let sonarProjectShouldExist:boolean = false;
+    let sonarProjectShouldExist: boolean = false;
 
     before(async () => {
       await fs.copyFile('./src/utils/test-sonar-project.properties', './sonar-project.properties');
@@ -122,14 +122,13 @@ error: Script "sonar-init" failed after 0 s with: ENOENT: no such file or direct
 
         assert.isTrue(nock.isDone(), `There are remaining expected HTTP calls: ${nock.pendingMocks().toString()}`);
 
-        const expectedOutput = `info: Script "sonar-init" starting...
-info: Initializing 'my-test-project-key' Sonar project...
-debug: *** Calling Sonar API to check whether my-test-project-key project exists in https://example.com/sonar/ Sonar instance...
-debug: *** Sonar API response :
-warn: 'my-test-project-key' Sonar project already exists at https://example.com/sonar/dashboard?id=my-test-project-key ! Skipping sonar initialization...
-info: Script "sonar-init" successful after 0 s
-`;
-        expect(loggerRecorder.recordedLogs).to.equal(expectedOutput);
+        // Expected action is to initialize a new Sonar project
+        expect(loggerRecorder.recordedLogs).to.satisfy(
+          (logs: string) => logs.startsWith(`info: Script "sonar-init" starting...
+info: Initializing 'my-test-project-key' Sonar project...`
+          ));
+        expect(loggerRecorder.recordedLogs).to.contain(
+          "warn: 'my-test-project-key' Sonar project already exists at https://example.com/sonar/dashboard?id=my-test-project-key ! Skipping sonar initialization...");
 
         // @ts-ignore
         // tslint:disable-next-line:no-unused-expression
@@ -149,14 +148,13 @@ info: Script "sonar-init" successful after 0 s
 
         assert.isTrue(nock.isDone(), `There are remaining expected HTTP calls: ${nock.pendingMocks().toString()}`);
 
-        const expectedOutput = `info: Script "sonar-init" starting...
-info: Initializing 'my-test-project-key' Sonar project...
-debug: *** Calling Sonar API to check whether my-test-project-key project exists in https://example.com/sonar/ Sonar instance...
-debug: *** Sonar API response :
-info: 'my-test-project-key' Sonar project successfully initialized, and available at https://example.com/sonar/dashboard?id=my-test-project-key
-info: Script "sonar-init" successful after 0 s
-`;
-        expect(loggerRecorder.recordedLogs).to.equal(expectedOutput);
+        // Expected action is to initialize a new Sonar project
+        expect(loggerRecorder.recordedLogs).to.satisfy(
+          (logs: string) => logs.startsWith(`info: Script "sonar-init" starting...
+info: Initializing 'my-test-project-key' Sonar project...`
+          ));
+        expect(loggerRecorder.recordedLogs).to.contain("info: 'my-test-project-key' Sonar project successfully initialized, and available at https://example.com/sonar/dashboard?id=my-test-project-key")
+        expect(loggerRecorder.recordedLogs).to.not.contain("warn");
 
         // @ts-ignore
         // tslint:disable-next-line:no-unused-expression
@@ -193,6 +191,15 @@ info: Script "sonar-init" successful after 0 s
 `;
         expect(loggerRecorder.recordedLogs).to.equal(expectedOutput);
 
+        // Expected action is to check Sonar project already exists
+        expect(loggerRecorder.recordedLogs).to.satisfy(
+          (logs: string) => logs.startsWith(`info: Script "sonar-init" starting...
+info: Checking 'my-test-project-key' Sonar project already exists...`
+          ));
+        expect(loggerRecorder.recordedLogs).to.contain(
+          "info: 'my-test-project-key' Sonar project exists at https://example.com/sonar/dashboard?id=my-test-project-key as expected.");
+        expect(loggerRecorder.recordedLogs).to.not.contain("warn");
+
         // @ts-ignore
         // tslint:disable-next-line:no-unused-expression
         shellCommand.should.not.have.been.called;
@@ -220,6 +227,16 @@ info: 'my-test-project-key' Sonar project successfully initialized, and availabl
 info: Script "sonar-init" successful after 0 s
 `;
         expect(loggerRecorder.recordedLogs).to.equal(expectedOutput);
+
+        // Expected action is to check Sonar project already exists
+        expect(loggerRecorder.recordedLogs).to.satisfy(
+          (logs: string) => logs.startsWith(`info: Script "sonar-init" starting...
+info: Checking 'my-test-project-key' Sonar project already exists...`
+          ));
+        expect(loggerRecorder.recordedLogs).to.contain(
+          "warn: 'my-test-project-key' Sonar project does not yet exist! Initializing it...");
+        expect(loggerRecorder.recordedLogs).to.contain(
+          "info: 'my-test-project-key' Sonar project successfully initialized, and available at https://example.com/sonar/dashboard?id=my-test-project-key");
 
         // @ts-ignore
         // tslint:disable-next-line:no-unused-expression
