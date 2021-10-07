@@ -1,6 +1,7 @@
 // ==========================================
 // Disabling some linting rules is OK in test files.
 // tslint:disable:no-console
+// tslint:disable:max-func-body-length
 // ==========================================
 import { describe, it } from 'mocha';
 import { assert, expect } from 'chai';
@@ -163,7 +164,70 @@ info: Script "sonar-init" successful after 0 s
         shellCommand.should.have.been.calledWithExactly('./node_modules/.bin/sonar-scanner', []);
         shellCommand.should.have.been.calledWithExactly('./node_modules/.bin/sonar-scanner', ['-Dsonar.branch.name=develop']);
       });
-    })
+    });
+
+    describe(' given that sonar project is expected to already exist', async () => {
+      before(() => {
+        sonarProjectShouldExist = true;
+      });
+
+      it(` should skip sonar project initialization without any warning when it does already exist.`, async () => {
+        simulateSonarProjectAlreadyExists();
+
+        // @ts-ignore
+        const shellCommand = sandbox.spy(SonarInitScript.prototype, 'invokeShellCommand');
+
+        const loggerRecorder = new LoggerRecorder();
+        const sonarInitScript = getSonarInitScript(sonarProjectShouldExist, loggerRecorder.logger);
+
+        await sonarInitScript.run();
+
+        assert.isTrue(nock.isDone(), `There are remaining expected HTTP calls: ${nock.pendingMocks().toString()}`);
+
+        const expectedOutput = `info: Script "sonar-init" starting...
+info: Checking 'my-test-project-key' Sonar project already exists...
+debug: *** Calling Sonar API to check whether my-test-project-key project exists in https://example.com/sonar/ Sonar instance...
+debug: *** Sonar API response :
+info: 'my-test-project-key' Sonar project exists at https://example.com/sonar/dashboard?id=my-test-project-key as expected.
+info: Script "sonar-init" successful after 0 s
+`;
+        expect(loggerRecorder.recordedLogs).to.equal(expectedOutput);
+
+        // @ts-ignore
+        // tslint:disable-next-line:no-unused-expression
+        shellCommand.should.not.have.been.called;
+      });
+
+      it(` should initialize sonar project with a warning when it does not yet exist.`, async () => {
+        simulateSonarProjectDoesNotYetExist();
+
+        // @ts-ignore
+        const shellCommand = sandbox.stub(SonarInitScript.prototype, 'invokeShellCommand').returns(Promise.resolve(0));
+
+        const loggerRecorder = new LoggerRecorder();
+        const sonarInitScript = getSonarInitScript(sonarProjectShouldExist, loggerRecorder.logger);
+
+        await sonarInitScript.run();
+
+        assert.isTrue(nock.isDone(), `There are remaining expected HTTP calls: ${nock.pendingMocks().toString()}`);
+
+        const expectedOutput = `info: Script "sonar-init" starting...
+info: Checking 'my-test-project-key' Sonar project already exists...
+debug: *** Calling Sonar API to check whether my-test-project-key project exists in https://example.com/sonar/ Sonar instance...
+debug: *** Sonar API response :
+warn: 'my-test-project-key' Sonar project does not yet exist! Initializing it...
+info: 'my-test-project-key' Sonar project successfully initialized, and available at https://example.com/sonar/dashboard?id=my-test-project-key
+info: Script "sonar-init" successful after 0 s
+`;
+        expect(loggerRecorder.recordedLogs).to.equal(expectedOutput);
+
+        // @ts-ignore
+        // tslint:disable-next-line:no-unused-expression
+        shellCommand.should.have.been.calledTwice;
+        shellCommand.should.have.been.calledWithExactly('./node_modules/.bin/sonar-scanner', []);
+        shellCommand.should.have.been.calledWithExactly('./node_modules/.bin/sonar-scanner', ['-Dsonar.branch.name=develop']);
+      });
+    });
 
   });
 
