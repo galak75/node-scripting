@@ -6,7 +6,7 @@
 import { describe, it } from 'mocha';
 import { expect } from 'chai';
 import { setTestingConfigs, timeout } from '../utils/testingUtils';
-import { SonarScript } from './sonar';
+import { SONAR_SCANNER, SonarScript } from './sonar';
 import * as sinon from 'sinon';
 import * as fs from 'fs-extra';
 
@@ -105,10 +105,20 @@ error: Script "sonar" failed after 0 s with: ENOENT: no such file or directory, 
     it(` should successfully analyze code when project already exists in Sonar.`, async () => {
       simulateSonarProjectAlreadyExists();
 
+      // Mock all invoked shell commands
       // @ts-ignore
       const shellCommand = sandbox.stub(SonarScript.prototype, 'invokeShellCommand');
-      // All invoked shell commands will succeed
+
+      // Make git call succeed and write "current-local-branch" to stdout
+      shellCommand.withArgs('git', ['branch', '--show-current'], sinon.match.any).callThrough();
+      const mockSpawn = require('mock-spawn');
+      const mySpawn = mockSpawn();
+      require('child_process').spawn = mySpawn;
+      mySpawn.setDefault(mySpawn.simple(0 /* exit code */, 'current-local-branch' /* stdout */));
+
+      // Make all other shell commands succeed
       shellCommand.returns(Promise.resolve(0))
+
       // @ts-ignore
       const subScript = sandbox.stub(SonarScript.prototype, 'invokeScript');
 
@@ -128,9 +138,8 @@ error: Script "sonar" failed after 0 s with: ENOENT: no such file or directory, 
       // @ts-ignore
       // tslint:disable-next-line:no-unused-expression
       shellCommand.should.have.been.calledTwice;
-
-      // TODO Geraud : add more precise assertions
-
+      shellCommand.should.have.been.calledWith('git', ['branch', '--show-current']);
+      shellCommand.should.have.been.calledWith(SONAR_SCANNER, ['-Dsonar.branch.name=current-local-branch', '-Dsonar.branch.target=develop']);
     });
   });
 
