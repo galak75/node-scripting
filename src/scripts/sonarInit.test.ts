@@ -68,7 +68,7 @@ function simulateSonarProjectAlreadyExists() {
   .reply(200);
 }
 
-describe.only('sonar-init script', function () {
+describe('sonar-init script', function () {
   timeout(this, 30000);
 
   before(() => {
