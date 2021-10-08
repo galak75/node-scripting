@@ -129,6 +129,8 @@ error: Script "sonar" failed after 0 s with: ENOENT: no such file or directory, 
 
       expect(loggerRecorder.recordedLogs).to.contain(
         "info: Analyzing current branch source code...");
+      expect(loggerRecorder.recordedLogs).to.contain(
+        'info: Script "sonar" successful after 0 s');
 
       // TODO Geraud : improve assertion on logged messages
       // console.log("************************");
