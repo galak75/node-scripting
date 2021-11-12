@@ -20,6 +20,7 @@ import {
   withCustomRunFile,
   withLogNodeInstance
 } from './utils/testingUtils';
+const nock = require('nock');
 
 describe(`Scripts tests`, function() {
   timeout(this, 30000);
@@ -622,6 +623,66 @@ info: Script "testing:testingCallingScript" successful`;
       assert.isTrue(isSuccess);
 
       assert.isTrue(output.indexOf(`MAIN NODE_APP_INSTANCE: tests`) > -1);
+    });
+  });
+
+  describe('Sonar-init script', () => {
+    it(` should fail when sonar-project.properties is missing`, async () => {
+      const { output, isSuccess } = await run(`sonar-init`);
+      assert.isFalse(isSuccess);
+
+      const expectedOutput = `info: Script "sonar-init" starting...
+
+error: Script "sonar-init" failed after 0 s with: ENOENT: no such file or directory, open 'sonar-project.properties'
+`;
+      assert.isTrue(containsText(output, expectedOutput));
+    });
+
+    // Skipping this unit test suite: all these tests are integration tests on scripts; scripts are
+    // executed in another spawned process; therefore, using Nock to stub http calls does not work.
+    // One solution to make these tests succeed would be to run a sonar server in a side-car container,
+    // and then use it to test 'sonar' and 'sonar-init' scripts.
+    describe.skip(' with valid sonar-project.properties file', async () => {
+      before(async () => {
+        await fs.copyFile(
+          './src/utils/test-sonar-project_url-with-trailing-slash.properties',
+          './sonar-project.properties'
+        );
+      });
+      after(async () => {
+        await fs.unlink('./sonar-project.properties');
+      });
+
+      afterEach(() => {
+        nock.cleanAll();
+      });
+
+      it(` should do something`, async () => {
+        nock('https://example.com')
+          .get('/sonar/api/project_branches/list')
+          .query({ project: 'my-project-key' })
+          .reply(200);
+
+        nock('https://example.com')
+          .get('/sonar/api/another_endpoint')
+          .reply(200);
+
+        const { output, isSuccess } = await run(`sonar-init`, '-v');
+
+        console.info('***** Pending mocks *****');
+        console.info(nock.pendingMocks());
+        console.info('*************************');
+
+        assert.isTrue(nock.isDone(), `There are remaining expected HTTP calls: ${nock.pendingMocks().toString()}`);
+
+        assert.isTrue(isSuccess);
+
+        const expectedOutput = `info: Script "sonar-init" starting...
+
+error: Script "sonar-init" failed after 0 s with: ENOENT: no such file or directory, open 'sonar-project.properties'
+`;
+        assert.isTrue(containsText(output, expectedOutput));
+      });
     });
   });
 });
