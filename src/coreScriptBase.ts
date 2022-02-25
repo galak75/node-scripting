@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/ban-types */
-import { ParsedArgumentsObject } from '@caporal/core';
-import { IGlobalOptions } from './globalOptions';
-import { ScriptBase } from './scriptBase';
+import { ParsedArgumentsObject } from "@caporal/core";
+import { IGlobalOptions } from "./globalOptions";
+import { ScriptBase } from "./scriptBase";
 
 /**
  * Base class for a core Script.

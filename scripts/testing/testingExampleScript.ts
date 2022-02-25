@@ -1,5 +1,5 @@
-import { Command, program as caporal } from '@caporal/core';
-import { ScriptBase, TESTING_SCRIPT_NAME_PREFIX } from '../../src';
+import { Command, program as caporal } from "@caporal/core";
+import { ScriptBase, TESTING_SCRIPT_NAME_PREFIX } from "../../src";
 
 export interface Options {
   lucky: number;
@@ -17,7 +17,7 @@ export class TestingExampleScript extends ScriptBase<Options> {
   protected async configure(command: Command): Promise<void> {
     command.option(`--lucky <number>`, `A lucky number`, {
       required: true,
-      validator: caporal.NUMBER
+      validator: caporal.NUMBER,
     });
   }
 

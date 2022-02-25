@@ -1,12 +1,13 @@
 /* eslint-disable @typescript-eslint/require-await */
-import { Command } from '@caporal/core';
-import { utils } from '@villedemontreal/general-utils';
-import * as _ from 'lodash';
-import * as path from 'path';
-import { configs } from '../config/configs';
-import { CoreScriptBase } from '../coreScriptBase';
-const notifier = require('node-notifier');
-
+/* eslint-disable no-control-regex */
+/* eslint-disable no-constant-condition */
+import { Command } from "@caporal/core";
+import { utils } from "@villedemontreal/general-utils";
+import * as _ from "lodash";
+import * as path from "path";
+import { configs } from "../config/configs";
+import { CoreScriptBase } from "../coreScriptBase";
+import notifier = require("node-notifier");
 export interface Options {
   /**
    * Disable the visual notification
@@ -16,7 +17,7 @@ export interface Options {
 
 export class WatchScript extends CoreScriptBase<Options> {
   get name(): string {
-    return 'watch';
+    return "watch";
   }
 
   get description(): string {
@@ -39,7 +40,6 @@ that point since the incremental compilation is already done by this script.`;
         `Starting incremental compilation...\n` +
         `==========================================\n`
     );
-    const projectName = require(configs.projectRoot + '/package.json').name;
     let ignoreNextCompilationComplete = false;
     const compilationCompletetRegEx = /(Compilation complete)|(Found 0 errors)/;
     const errorRegEx = /(: error)|(error)/;
@@ -48,7 +48,7 @@ that point since the incremental compilation is already done by this script.`;
       if (stdoutData) {
         const stdoutDataClean = stdoutData.toString();
         this.logger.info(stdoutDataClean);
-
+        const projectName = require(configs.projectRoot + "/package.json").name;
         if (this.options.dn) {
           return;
         }
@@ -58,17 +58,17 @@ that point since the incremental compilation is already done by this script.`;
           error = true;
           notifier.notify({
             title: projectName,
-            message: 'incremental compilation error',
+            message: "incremental compilation error",
             icon: path.normalize(`${__dirname}/../../../assets/notifications/error.png`),
-            sound: false
+            sound: false,
           });
         } else if (compilationCompletetRegEx.test(stdoutDataClean)) {
           if (!ignoreNextCompilationComplete) {
             notifier.notify({
               title: projectName,
-              message: 'incremental compilation done',
+              message: "incremental compilation done",
               icon: path.normalize(`${__dirname}/../../../assets/notifications/success.png`),
-              sound: false
+              sound: false,
             });
           }
         }
@@ -83,24 +83,24 @@ that point since the incremental compilation is already done by this script.`;
     while (true) {
       try {
         await this.invokeShellCommand(
-          'node',
+          "node",
           [
             `${configs.projectRoot}/node_modules/typescript/lib/tsc.js`,
-            '--project',
+            "--project",
             configs.projectRoot,
-            '--watch',
-            '--pretty'
+            "--watch",
+            "--pretty",
           ],
           {
-            outputHandler
+            outputHandler,
           }
         );
       } catch (err) {
         // ==========================================
         // @see https://stackoverflow.com/a/25444766/843699
         // ==========================================
-        if (_.isString(err) && err.indexOf('3221225786') >= 0) {
-          this.logger.error('Exiting...');
+        if (_.isString(err) && err.indexOf("3221225786") >= 0) {
+          this.logger.error("Exiting...");
           process.exit(0);
         }
 

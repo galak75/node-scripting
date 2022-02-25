@@ -1,5 +1,5 @@
-import { Command, program as caporal } from '@caporal/core';
-import { ScriptBase, TESTING_SCRIPT_NAME_PREFIX } from '../../src';
+import { Command, program as caporal } from "@caporal/core";
+import { ScriptBase, TESTING_SCRIPT_NAME_PREFIX } from "../../src";
 
 export interface Options {
   throwError?: boolean;
@@ -18,7 +18,7 @@ export class TestingScript extends ScriptBase<Options> {
   protected async configure(command: Command): Promise<void> {
     command.option(`--throwError`, `Throw an error`);
     command.option(`-p, --port <number>`, `A port number`, {
-      validator: caporal.NUMBER
+      validator: caporal.NUMBER,
     });
   }
 

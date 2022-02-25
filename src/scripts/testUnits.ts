@@ -1,8 +1,8 @@
 /* eslint-disable @typescript-eslint/require-await */
-import { Command, program } from '@caporal/core';
-import * as _ from 'lodash';
-import { configs } from '../config/configs';
-import { CoreScriptBase } from '../coreScriptBase';
+import { Command, program } from "@caporal/core";
+import * as _ from "lodash";
+import { configs } from "../config/configs";
+import { CoreScriptBase } from "../coreScriptBase";
 
 export interface Options {
   bail?: boolean;
@@ -12,16 +12,16 @@ export interface Options {
 
 export class TestUnitsScript extends CoreScriptBase<Options> {
   get name(): string {
-    return 'test-units';
+    return "test-units";
   }
 
   get description(): string {
     return `Run the unit tests.`;
   }
   protected get requiredDependencies(): string[] {
-    const deps = ['mocha'];
+    const deps = ["mocha"];
     if (this.options.jenkins) {
-      deps.push('mocha-jenkins-reporter');
+      deps.push("mocha-jenkins-reporter");
     }
     return deps;
   }
@@ -29,10 +29,14 @@ export class TestUnitsScript extends CoreScriptBase<Options> {
   protected async configure(command: Command): Promise<void> {
     command.option(`--bail`, `Stop the execution of the tests as soon as an error occures.`);
     command.option(`--jenkins`, `Configure the tests to be run by Jenkins.`);
-    command.option(`--report <path>`, `The relative path to the report, when the tests are run for Jenkins.`, {
-      default: `output/test-results/report.xml`,
-      validator: program.STRING
-    });
+    command.option(
+      `--report <path>`,
+      `The relative path to the report, when the tests are run for Jenkins.`,
+      {
+        default: `output/test-results/report.xml`,
+        validator: program.STRING,
+      }
+    );
   }
   protected async main() {
     const cmdArgs = [];
@@ -62,7 +66,7 @@ export class TestUnitsScript extends CoreScriptBase<Options> {
     // Stop testing as soon as one test fails?
     // ==========================================
     if (this.options.bail) {
-      cmdArgs.push('--bail');
+      cmdArgs.push("--bail");
     }
 
     // ==========================================
@@ -78,24 +82,24 @@ export class TestUnitsScript extends CoreScriptBase<Options> {
       if (this.options.report) {
         process.env.JUNIT_REPORT_PATH = this.options.report;
       } else if (!process.env.JUNIT_REPORT_PATH) {
-        process.env.JUNIT_REPORT_PATH = 'output/test-results/report.xml';
+        process.env.JUNIT_REPORT_PATH = "output/test-results/report.xml";
       }
 
-      this.logger.info('Exporting tests to junit file ' + process.env.JUNIT_REPORT_PATH);
-      cmdArgs.push('--reporter');
-      cmdArgs.push('mocha-jenkins-reporter');
+      this.logger.info("Exporting tests to junit file " + process.env.JUNIT_REPORT_PATH);
+      cmdArgs.push("--reporter");
+      cmdArgs.push("mocha-jenkins-reporter");
     }
 
     try {
-      await this.invokeShellCommand('node', cmdArgs, {
-        useTestsNodeAppInstance: true
+      await this.invokeShellCommand("node", cmdArgs, {
+        useTestsNodeAppInstance: true,
       });
 
       this.logger.info(
         "   \u21b3  type 'run show-coverage' (or './run show-coverage' on Linux/Mac) to display the HTML report"
       );
     } catch (err) {
-      throw new Error('Some unit tests failed');
+      throw new Error("Some unit tests failed");
     }
   }
 
@@ -104,7 +108,7 @@ export class TestUnitsScript extends CoreScriptBase<Options> {
       return [];
     }
 
-    return tokens.map(token => {
+    return tokens.map((token) => {
       return _.isNil(token) ? token : `"${_.trim(token, '"')}"`;
     });
   }

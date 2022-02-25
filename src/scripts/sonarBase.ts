@@ -1,9 +1,9 @@
-import * as path from 'path';
-import * as request from 'superagent';
-import { URL } from 'url';
-import { ScriptBase } from '../scriptBase';
+import * as path from "path";
+import * as request from "superagent";
+import { URL } from "url";
+import { ScriptBase } from "../scriptBase";
 
-const properties = require('java-properties');
+const properties = require("java-properties");
 
 export interface SonarProjectInformation {
   sonarHostUrl: string;
@@ -11,10 +11,15 @@ export interface SonarProjectInformation {
 }
 
 export abstract class SonarBaseScript<Options> extends ScriptBase<Options> {
-  protected async sonarProjectAlreadyExists(sonarProjectKey: string, sonarHostUrl: string): Promise<boolean> {
+  protected async sonarProjectAlreadyExists(
+    sonarProjectKey: string,
+    sonarHostUrl: string
+  ): Promise<boolean> {
     let res;
 
-    this.logger.debug(`*** Calling Sonar host check whether ${sonarHostUrl} Sonar instance is reachable...`);
+    this.logger.debug(
+      `*** Calling Sonar host check whether ${sonarHostUrl} Sonar instance is reachable...`
+    );
 
     try {
       res = await request.head(new URL(sonarHostUrl).toString()).redirects(5).timeout(20000);
@@ -41,7 +46,7 @@ export abstract class SonarBaseScript<Options> extends ScriptBase<Options> {
       }
     }
 
-    this.logger.debug('*** Sonar API response :', { status: res.statusCode, text: res.text });
+    this.logger.debug("*** Sonar API response :", { status: res.statusCode, text: res.text });
 
     if (res.ok) {
       return true;
@@ -50,25 +55,29 @@ export abstract class SonarBaseScript<Options> extends ScriptBase<Options> {
       return false;
     }
 
-    throw { msg: 'Unexpected response from Sonar API!', response: res };
+    throw { msg: "Unexpected response from Sonar API!", response: res };
   }
   protected getSonarProjectInformation(): SonarProjectInformation {
-    const sonarProperties = properties.of('sonar-project.properties');
+    const sonarProperties = properties.of("sonar-project.properties");
     const result = {
-      sonarHostUrl: sonarProperties.get('sonar.host.url'),
-      sonarProjectKey: sonarProperties.get('sonar.projectKey')
+      sonarHostUrl: sonarProperties.get("sonar.host.url"),
+      sonarProjectKey: sonarProperties.get("sonar.projectKey"),
     };
     if (!result.sonarHostUrl) {
-      throw new Error('"sonar.host.url" property must be defined in "sonar-project.properties" file!');
+      throw new Error(
+        '"sonar.host.url" property must be defined in "sonar-project.properties" file!'
+      );
     }
     if (!result.sonarProjectKey) {
-      throw new Error('"sonar.projectKey" property must be defined in "sonar-project.properties" file!');
+      throw new Error(
+        '"sonar.projectKey" property must be defined in "sonar-project.properties" file!'
+      );
     }
     return result;
   }
   private getBranchesListSonarEndpointUrl(sonarHostUrl: string) {
     const endpointUrl = new URL(sonarHostUrl);
-    endpointUrl.pathname = path.join(endpointUrl.pathname, 'api/project_branches/list');
+    endpointUrl.pathname = path.join(endpointUrl.pathname, "api/project_branches/list");
     return endpointUrl.toString();
   }
 }

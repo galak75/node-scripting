@@ -1,7 +1,7 @@
-import { Command, program } from '@caporal/core';
-import { CoreScriptBase } from '../coreScriptBase';
-import { LintScript } from './lint';
-import { TestUnitsScript } from './testUnits';
+import { Command, program } from "@caporal/core";
+import { CoreScriptBase } from "../coreScriptBase";
+import { LintScript } from "./lint";
+import { TestUnitsScript } from "./testUnits";
 
 export interface Options {
   bail?: boolean;
@@ -11,7 +11,7 @@ export interface Options {
 
 export class TestScript extends CoreScriptBase<Options> {
   get name(): string {
-    return 'test';
+    return "test";
   }
 
   get description(): string {
@@ -27,10 +27,14 @@ export class TestScript extends CoreScriptBase<Options> {
   protected async configure(command: Command): Promise<void> {
     command.option(`--bail`, `Stop the execution of the tests as soon as an error occures.`);
     command.option(`--jenkins`, `Configure the tests to be run by Jenkins.`);
-    command.option(`--report <path>`, `The relative path to the report, when the tests are run for Jenkins.`, {
-      default: `output/test-results/report.xml`,
-      validator: program.STRING
-    });
+    command.option(
+      `--report <path>`,
+      `The relative path to the report, when the tests are run for Jenkins.`,
+      {
+        default: `output/test-results/report.xml`,
+        validator: program.STRING,
+      }
+    );
   }
 
   protected async main() {

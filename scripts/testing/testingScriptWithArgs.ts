@@ -1,5 +1,5 @@
-import { Command, program as caporal } from '@caporal/core';
-import { IGlobalOptions, ScriptBase, TESTING_SCRIPT_NAME_PREFIX } from '../../src';
+import { Command, program as caporal } from "@caporal/core";
+import { IGlobalOptions, ScriptBase, TESTING_SCRIPT_NAME_PREFIX } from "../../src";
 
 export type Args = {
   name: string;
@@ -24,10 +24,10 @@ export class TestingScriptWithArgs extends ScriptBase<Options, IGlobalOptions, A
     command.argument(`<name>`, `a name`);
     command.option(`--port <number>`, `A port number`, {
       required: true,
-      validator: caporal.NUMBER
+      validator: caporal.NUMBER,
     });
     command.option(`--delay <number>`, `A delay in ms`, {
-      validator: caporal.NUMBER
+      validator: caporal.NUMBER,
     });
     command.option(`--throwError`, `Throw an error`);
   }
@@ -37,7 +37,7 @@ export class TestingScriptWithArgs extends ScriptBase<Options, IGlobalOptions, A
       `Start service ${this.args.name} on port ${this.options.port} with delay ${this.options.delay}, --verbose: ${this.options.verbose}`
     );
     if (this.options.throwError) {
-      throw new Error('Some error...');
+      throw new Error("Some error...");
     }
   }
 }

@@ -1,6 +1,6 @@
-import { ScriptBase, TESTING_SCRIPT_NAME_PREFIX } from '../../src';
-import { ITestingGlobalOptions } from './testingGlobalOptions';
-import { TestingScriptGlobalCustomOptions2 } from './testingScriptCustomGlobalOptions2';
+import { ScriptBase, TESTING_SCRIPT_NAME_PREFIX } from "../../src";
+import { ITestingGlobalOptions } from "./testingGlobalOptions";
+import { TestingScriptGlobalCustomOptions2 } from "./testingScriptCustomGlobalOptions2";
 
 export interface Options {
   throwError?: boolean;

@@ -1,5 +1,5 @@
-import { Command, program as caporal } from '@caporal/core';
-import { ScriptBase, TESTING_SCRIPT_NAME_PREFIX } from '../../src';
+import { Command, program as caporal } from "@caporal/core";
+import { ScriptBase, TESTING_SCRIPT_NAME_PREFIX } from "../../src";
 
 export interface Options {
   username: string;
@@ -18,7 +18,7 @@ export class TestingtestingHiddenScript extends ScriptBase<Options> {
     command.hide();
     command.option(`--username <name>`, `A username`, {
       required: true,
-      validator: caporal.STRING
+      validator: caporal.STRING,
     });
   }
 

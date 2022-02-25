@@ -1,9 +1,9 @@
 /* eslint-disable prefer-rest-params */
 /* eslint-disable @typescript-eslint/no-unsafe-return */
 /* eslint-disable no-console */
-import { Action, ActionParameters, chalk, Command, Program } from '@caporal/core';
-import { globalConstants } from '@villedemontreal/general-utils';
-import { IScriptConstructor, ScriptBase, TESTING_SCRIPT_NAME_PREFIX } from './scriptBase';
+import { Action, ActionParameters, chalk, Command, Program } from "@caporal/core";
+import { globalConstants } from "@villedemontreal/general-utils";
+import { IScriptConstructor, ScriptBase, TESTING_SCRIPT_NAME_PREFIX } from "./scriptBase";
 
 /**
  * Run a script or display some help, given
@@ -17,7 +17,10 @@ export async function main(caporal: Program, projectScriptsIndexModule: string, 
 
   await manageHelpCommand(caporal, localArgv);
 
-  const projectScriptsNames: Set<string> = await addProjectScripts(caporal, projectScriptsIndexModule);
+  const projectScriptsNames: Set<string> = await addProjectScripts(
+    caporal,
+    projectScriptsIndexModule
+  );
   await addCoreScripts(caporal, projectScriptsNames);
 
   let executedCommand: any;
@@ -35,7 +38,7 @@ export async function main(caporal: Program, projectScriptsIndexModule: string, 
     // ==========================================
     if (!err.meta?.error?.__reported) {
       console.error(
-        `${chalk.redBright('error')}: ${
+        `${chalk.redBright("error")}: ${
           err.message ? err.message : JSON.stringify(err, Object.getOwnPropertyNames(err))
         }\n`
       );
@@ -51,8 +54,8 @@ export async function main(caporal: Program, projectScriptsIndexModule: string, 
   }
 
   function addExecutedCommandExtractor() {
-    const runOriginal = caporal['_run'].bind(caporal);
-    caporal['_run'] = async function (result: any, cmd: any) {
+    const runOriginal = caporal["_run"].bind(caporal);
+    caporal["_run"] = async function (result: any, cmd: any) {
       executedCommand = cmd;
       return await runOriginal(...arguments);
     };
@@ -61,13 +64,13 @@ export async function main(caporal: Program, projectScriptsIndexModule: string, 
 
 function addUnhandledRejectionHandler() {
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  process.on('unhandledRejection', (reason, p) => {
+  process.on("unhandledRejection", (reason, p) => {
     console.error(`Promise rejection error : ${reason}`);
   });
 }
 
 async function manageHelpCommand(caporal: Program, localArgv: string[]) {
-  const helpCommand = (await caporal.getAllCommands()).find(cmd => cmd.name === 'help');
+  const helpCommand = (await caporal.getAllCommands()).find((cmd) => cmd.name === "help");
   if (helpCommand) {
     patchHelpCommand(caporal, helpCommand);
 
@@ -75,7 +78,7 @@ async function manageHelpCommand(caporal: Program, localArgv: string[]) {
     // Make the "help" command the default one
     // if no command is provided.
     // ==========================================
-    if (localArgv.length === 0 || (localArgv.length === 1 && localArgv[0] === '--nc')) {
+    if (localArgv.length === 0 || (localArgv.length === 1 && localArgv[0] === "--nc")) {
       helpCommand.default();
     }
   }
@@ -84,10 +87,10 @@ async function manageHelpCommand(caporal: Program, localArgv: string[]) {
 function patchHelpCommand(caporal: Program, helpCommand: Command) {
   const oldAction: Action = (helpCommand as any)._action;
   if (!oldAction) {
-    throw new Error('Expected to find the command action callback');
+    throw new Error("Expected to find the command action callback");
   }
   if ((helpCommand as any)._action.__hooked) {
-    throw new Error('Help command has already been patched');
+    throw new Error("Help command has already been patched");
   }
   (helpCommand as any)._action = (actionParams: ActionParameters) => {
     // eslint-disable-next-line @typescript-eslint/no-misused-promises
@@ -98,14 +101,14 @@ function patchHelpCommand(caporal: Program, helpCommand: Command) {
       // ==========================================
       let result: any;
       function onHelp() {
-        caporal.removeListener('help', onHelp);
+        caporal.removeListener("help", onHelp);
         resolve(result);
       }
-      caporal.addListener('help', onHelp);
+      caporal.addListener("help", onHelp);
       try {
         result = await oldAction(actionParams);
       } catch (err) {
-        caporal.removeListener('help', onHelp);
+        caporal.removeListener("help", onHelp);
         reject(err);
       }
     });
@@ -126,7 +129,13 @@ async function printHelpOnCaporalError(
   // ==========================================
   // Unknown command, display global help
   // ==========================================
-  if (err && err.message && err.message.startsWith('Unknown command ') && err.meta && err.meta.command) {
+  if (
+    err &&
+    err.message &&
+    err.message.startsWith("Unknown command ") &&
+    err.meta &&
+    err.meta.command
+  ) {
     await executeHelp(caporal, argv);
   }
 
@@ -139,17 +148,22 @@ async function printHelpOnCaporalError(
 }
 
 async function executeHelp(caporal: Program, argv: string[], command?: string) {
-  const helpOptions = argv.filter(arg => ['-v', '--verbose', '--quiet', '--silent', '--color'].includes(arg));
-  const args = ['help'];
+  const helpOptions = argv.filter((arg) =>
+    ["-v", "--verbose", "--quiet", "--silent", "--color"].includes(arg)
+  );
+  const args = ["help"];
   if (command) {
     args.push(command);
   }
-  args.push('--nc', ...helpOptions);
+  args.push("--nc", ...helpOptions);
 
   await caporal.run(args);
 }
 
-async function addProjectScripts(caporal: Program, scriptsIndexModule: string): Promise<Set<string>> {
+async function addProjectScripts(
+  caporal: Program,
+  scriptsIndexModule: string
+): Promise<Set<string>> {
   const scriptsNames: Set<string> = new Set();
 
   if (scriptsIndexModule) {

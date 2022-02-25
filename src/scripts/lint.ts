@@ -1,18 +1,15 @@
-import { CoreScriptBase } from '../coreScriptBase';
-import { PrettierScript } from './prettier';
-import { TsLintScript } from './tsLint';
+import { CoreScriptBase } from "../coreScriptBase";
 
 export class LintScript extends CoreScriptBase {
   get name(): string {
-    return 'lint';
+    return "lint";
   }
 
   get description(): string {
-    return `Run the Prettier and TSlint validation.`;
+    return `Run the ESlint validation.`;
   }
 
   protected async main() {
-    await this.invokeScript(PrettierScript, {}, {});
-    await this.invokeScript(TsLintScript, {}, {});
+    await this.invokeShellCommand("eslint", []);
   }
 }

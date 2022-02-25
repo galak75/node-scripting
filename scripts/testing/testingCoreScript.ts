@@ -1,5 +1,5 @@
-import { TESTING_SCRIPT_NAME_PREFIX } from '../../src';
-import { CoreScriptBase } from '../../src/coreScriptBase';
+import { TESTING_SCRIPT_NAME_PREFIX } from "../../src";
+import { CoreScriptBase } from "../../src/coreScriptBase";
 
 export class TestingCoreScript extends CoreScriptBase {
   get name(): string {
