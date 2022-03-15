@@ -9,12 +9,12 @@ import {
   ParsedArgumentsObject,
   ParsedOptions,
   Program,
-} from "@caporal/core";
-import { globalConstants, utils } from "@villedemontreal/general-utils";
-import { StdioOptions } from "child_process";
-import * as _ from "lodash";
-import { configs } from "./config/configs";
-import { IGlobalOptions } from "./globalOptions";
+} from '@caporal/core';
+import { globalConstants, utils } from '@villedemontreal/general-utils';
+import { StdioOptions } from 'child_process';
+import * as _ from 'lodash';
+import { configs } from './config/configs';
+import { IGlobalOptions } from './globalOptions';
 
 /**
  * A script with a name starting with this prefix
@@ -22,7 +22,7 @@ import { IGlobalOptions } from "./globalOptions";
  * are running (ie: when the NODE_APP_INSTANCE env
  * var is "tests").
  */
-export const TESTING_SCRIPT_NAME_PREFIX = "testing:";
+export const TESTING_SCRIPT_NAME_PREFIX = 'testing:';
 
 /**
  * Constructor definition of a Script class
@@ -114,7 +114,7 @@ export abstract class ScriptBase<
    * Register the script on Caporal
    */
   public async registerScript(caporal: Program): Promise<void> {
-    const command = caporal.command(this.name, this.description + "\n", this.commandConfig);
+    const command = caporal.command(this.name, this.description + '\n', this.commandConfig);
     await this.addAction(command);
     await this.addHelpBody(command);
     await this.configure(command);
@@ -132,7 +132,7 @@ export abstract class ScriptBase<
     try {
       await this.main();
     } catch (originalError) {
-      const err = typeof originalError === "string" ? new Error(originalError) : originalError;
+      const err = typeof originalError === 'string' ? new Error(originalError) : originalError;
       if (err.__reported) {
         this.logger.warn(
           `Script "${chalk.cyanBright(this.outputName)}" was aborted after ${chalk.magenta(
@@ -361,9 +361,9 @@ export abstract class ScriptBase<
       }
       this.logger.warn(
         `The script may still work if those dependencies are available ${chalk.italic(
-          "transitively"
+          'transitively'
         )}, but it may be a good idea to add them directly to your "${chalk.cyanBright(
-          "package.json"
+          'package.json'
         )}" file.`
       );
     }

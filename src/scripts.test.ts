@@ -3,14 +3,14 @@
 /* eslint-disable no-console */
 /* eslint-disable prefer-rest-params */
 /* eslint-disable max-lines-per-function */
-import { program as caporal, Program } from "@caporal/core";
-import { globalConstants, utils } from "@villedemontreal/general-utils";
-import { assert } from "chai";
-import * as fs from "fs-extra";
-import * as path from "path";
-import * as sinon from "sinon";
-import { TestingScript } from "../scripts/testing/testingScript";
-import { configs } from "./config/configs";
+import { program as caporal, Program } from '@caporal/core';
+import { globalConstants, utils } from '@villedemontreal/general-utils';
+import { assert } from 'chai';
+import * as fs from 'fs-extra';
+import * as path from 'path';
+import * as sinon from 'sinon';
+import { TestingScript } from '../scripts/testing/testingScript';
+import { configs } from './config/configs';
 import {
   containsText,
   isMainHelpDisplayed,
@@ -19,8 +19,8 @@ import {
   timeout,
   withCustomRunFile,
   withLogNodeInstance,
-} from "./utils/testingUtils";
-const nock = require("nock");
+} from './utils/testingUtils';
+const nock = require('nock');
 
 describe(`Scripts tests`, function () {
   timeout(this, 30000);
@@ -335,7 +335,7 @@ describe(`Scripts tests`, function () {
     it(`We can register a script without passing action parameters`, async () => {
       const prog = new Program();
       assert.isFalse(
-        caporal.getCommands().some((command) => command.name === "testing:testingScript")
+        caporal.getCommands().some((command) => command.name === 'testing:testingScript')
       );
 
       const script = new TestingScript(null); // no params!
@@ -343,7 +343,7 @@ describe(`Scripts tests`, function () {
 
       let found = false;
       for (let i = prog.getCommands().length - 1; i >= 0; --i) {
-        if (prog.getCommands()[i].name === "testing:testingScript") {
+        if (prog.getCommands()[i].name === 'testing:testingScript') {
           found = true;
           prog.getCommands().splice(i, 1);
           break;
@@ -355,12 +355,12 @@ describe(`Scripts tests`, function () {
     it(`Calling a script using NPM`, async () => {
       let output = ``;
       await utils.exec(
-        configs.isWindows ? "npm.cmd" : "npm",
+        configs.isWindows ? 'npm.cmd' : 'npm',
         [`run`, `prettier`, `--`, `--nc`, `--help`],
         {
           outputHandler: (stdoutData: string, stderrData: string) => {
-            const newOut = `${stdoutData ? " " + stdoutData : ""} ${
-              stderrData ? " " + stderrData : ""
+            const newOut = `${stdoutData ? ' ' + stdoutData : ''} ${
+              stderrData ? ' ' + stderrData : ''
             } `;
             output += newOut;
           },
@@ -381,15 +381,15 @@ describe(`Scripts tests`, function () {
      * idea to move this code in a service or in an utility!
      */
     it(`Calling a script programmatically`, async () => {
-      let output = "";
+      let output = '';
       const logger = new Proxy(
         {},
         {
           get: (target, prop) => {
             return function () {
-              if (prop === "info") {
+              if (prop === 'info') {
                 // eslint-disable-next-line @typescript-eslint/restrict-plus-operands
-                output += arguments[0] + "\n";
+                output += arguments[0] + '\n';
               }
             };
           },
@@ -450,7 +450,7 @@ describe(`Scripts tests`, function () {
 
     it(`"scriptsIndexModule" can be undefined`, async () => {
       const { output, isSuccess } = await withCustomRunFile(
-        "scriptsIndexModule: `./scripts/index`,",
+        'scriptsIndexModule: `./scripts/index`,',
         ``,
         `prettier`,
         `--help`,
@@ -476,7 +476,7 @@ describe(`Scripts tests`, function () {
     });
   });
 
-  describe("Cascading scripts", () => {
+  describe('Cascading scripts', () => {
     it(`Call subscript with defaults`, async () => {
       const { output, isSuccess } = await run(
         `testing:testingCallingScript`,
@@ -651,7 +651,7 @@ info: Script "testing:testingCallingScript" successful`;
     });
   });
 
-  describe("Sonar-init script", () => {
+  describe('Sonar-init script', () => {
     it(` should fail when sonar-project.properties is missing`, async () => {
       const { output, isSuccess } = await run(`sonar-init`);
       assert.isFalse(isSuccess);
@@ -667,15 +667,15 @@ error: Script "sonar-init" failed after 0 s with: ENOENT: no such file or direct
     // executed in another spawned process; therefore, using Nock to stub http calls does not work.
     // One solution to make these tests succeed would be to run a sonar server in a side-car container,
     // and then use it to test 'sonar' and 'sonar-init' scripts.
-    describe.skip(" with valid sonar-project.properties file", async () => {
+    describe.skip(' with valid sonar-project.properties file', async () => {
       before(async () => {
         await fs.copyFile(
-          "./src/utils/test-sonar-project_url-with-trailing-slash.properties",
-          "./sonar-project.properties"
+          './src/utils/test-sonar-project_url-with-trailing-slash.properties',
+          './sonar-project.properties'
         );
       });
       after(async () => {
-        await fs.unlink("./sonar-project.properties");
+        await fs.unlink('./sonar-project.properties');
       });
 
       afterEach(() => {
@@ -683,18 +683,18 @@ error: Script "sonar-init" failed after 0 s with: ENOENT: no such file or direct
       });
 
       it(` should do something`, async () => {
-        nock("https://example.com")
-          .get("/sonar/api/project_branches/list")
-          .query({ project: "my-project-key" })
+        nock('https://example.com')
+          .get('/sonar/api/project_branches/list')
+          .query({ project: 'my-project-key' })
           .reply(200);
 
-        nock("https://example.com").get("/sonar/api/another_endpoint").reply(200);
+        nock('https://example.com').get('/sonar/api/another_endpoint').reply(200);
 
-        const { output, isSuccess } = await run(`sonar-init`, "-v");
+        const { output, isSuccess } = await run(`sonar-init`, '-v');
 
-        console.info("***** Pending mocks *****");
+        console.info('***** Pending mocks *****');
         console.info(nock.pendingMocks());
-        console.info("*************************");
+        console.info('*************************');
 
         assert.isTrue(
           nock.isDone(),

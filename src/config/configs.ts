@@ -1,6 +1,6 @@
-import { Program } from "@caporal/core";
-import * as os from "os";
-import * as path from "path";
+import { Program } from '@caporal/core';
+import * as os from 'os';
+import * as path from 'path';
 
 export class Configs {
   /**
@@ -18,8 +18,8 @@ export class Configs {
 
   constructor() {
     // From the "dist/src/config" folder
-    this.libRoot = path.normalize(__dirname + "/../../..");
-    this.isWindows = os.platform() === "win32";
+    this.libRoot = path.normalize(__dirname + '/../../..');
+    this.isWindows = os.platform() === 'win32';
   }
 
   /**

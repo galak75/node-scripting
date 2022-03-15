@@ -1,6 +1,6 @@
 {
   "name": "@villedemontreal/scripting",
-  "version": "1.6.0-beta-2",
+  "version": "2.0.0-beta",
   "description": "Scripting core utilities",
   "main": "dist/src/index.js",
   "typings": "dist/src",
@@ -15,6 +15,7 @@
     "test": "node run test",
     "lint": "node run lint",
     "lint-fix": "node run lint-fix",
+    "lint:fix": "eslint . --fix",
     "watch": "node run watch"
   },
   "repository": {

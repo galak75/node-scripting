@@ -1,4 +1,4 @@
-import { ScriptBase, TESTING_SCRIPT_NAME_PREFIX } from "../../src";
+import { ScriptBase, TESTING_SCRIPT_NAME_PREFIX } from '../../src';
 
 export class TestingDepMissingScript extends ScriptBase {
   get name(): string {
@@ -10,7 +10,7 @@ export class TestingDepMissingScript extends ScriptBase {
   }
 
   protected get requiredDependencies(): string[] {
-    return ["_missingDependency"];
+    return ['_missingDependency'];
   }
 
   protected async main() {

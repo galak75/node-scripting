@@ -1,7 +1,7 @@
-import { Command, program as caporal } from "@caporal/core";
-import { ScriptBase, TESTING_SCRIPT_NAME_PREFIX } from "../../src";
-import { TestingExampleScript } from "./testingExampleScript";
-import { TestingScriptWithArgs } from "./testingScriptWithArgs";
+import { Command, program as caporal } from '@caporal/core';
+import { ScriptBase, TESTING_SCRIPT_NAME_PREFIX } from '../../src';
+import { TestingExampleScript } from './testingExampleScript';
+import { TestingScriptWithArgs } from './testingScriptWithArgs';
 
 export interface Options {
   foo: number;
@@ -47,7 +47,7 @@ export class TestingCallingScript extends ScriptBase<Options> {
         throwError: this.options.throwError,
         ...(this.options.forceVerboseToFalse ? { verbose: false } : {}),
       },
-      { name: this.options.bar ?? "MyService" }
+      { name: this.options.bar ?? 'MyService' }
     );
     await this.invokeScript(TestingExampleScript, { lucky: this.options.foo }, {});
   }

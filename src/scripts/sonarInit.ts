@@ -1,12 +1,12 @@
-import { URL } from "url";
-import { SONAR_SCANNER } from "./sonar";
-import { SonarBaseScript } from "./sonarBase";
-import { IGlobalOptions } from "../globalOptions";
-import * as path from "path";
+import { URL } from 'url';
+import { SONAR_SCANNER } from './sonar';
+import { SonarBaseScript } from './sonarBase';
+import { IGlobalOptions } from '../globalOptions';
+import * as path from 'path';
 
 export class SonarInitScript extends SonarBaseScript<IGlobalOptions> {
   get name(): string {
-    return "sonar-init";
+    return 'sonar-init';
   }
 
   get description(): string {
@@ -28,7 +28,7 @@ export class SonarInitScript extends SonarBaseScript<IGlobalOptions> {
 
   private async initSonarProject() {
     await this.invokeShellCommand(SONAR_SCANNER, []);
-    await this.invokeShellCommand(SONAR_SCANNER, ["-Dsonar.branch.name=develop"]);
+    await this.invokeShellCommand(SONAR_SCANNER, ['-Dsonar.branch.name=develop']);
   }
 
   private logScriptStart(sonarProjectKey: string) {
@@ -51,7 +51,7 @@ export class SonarInitScript extends SonarBaseScript<IGlobalOptions> {
 
   private buildSonarProjectUrl(sonarProjectKey: string, sonarHostUrl: string): URL {
     const projectUrl = new URL(sonarHostUrl);
-    projectUrl.pathname = path.join(projectUrl.pathname, "dashboard");
+    projectUrl.pathname = path.join(projectUrl.pathname, 'dashboard');
     projectUrl.search = `?id=${sonarProjectKey}`;
     return projectUrl;
   }

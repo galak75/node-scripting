@@ -1,7 +1,7 @@
-import { Command, program } from "@caporal/core";
-import { CoreScriptBase } from "../coreScriptBase";
-import { LintScript } from "./lint";
-import { TestUnitsScript } from "./testUnits";
+import { Command, program } from '@caporal/core';
+import { CoreScriptBase } from '../coreScriptBase';
+import { LintScript } from './lint';
+import { TestUnitsScript } from './testUnits';
 
 export interface Options {
   bail?: boolean;
@@ -11,7 +11,7 @@ export interface Options {
 
 export class TestScript extends CoreScriptBase<Options> {
   get name(): string {
-    return "test";
+    return 'test';
   }
 
   get description(): string {

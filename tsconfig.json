@@ -19,5 +19,5 @@
     "rootDir": ".",
     "allowJs": true
   },
-  "include": ["./src", "./scripts", "./assets"]
+  "include": ["./src/**/*.ts", "./scripts/**/*.ts", "./assets"]
 }

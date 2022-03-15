@@ -1,8 +1,8 @@
-import { CoreScriptBase } from "../coreScriptBase";
+import { CoreScriptBase } from '../coreScriptBase';
 
 export class LintScript extends CoreScriptBase {
   get name(): string {
-    return "lint";
+    return 'lint';
   }
 
   get description(): string {
@@ -10,6 +10,6 @@ export class LintScript extends CoreScriptBase {
   }
 
   protected async main() {
-    await this.invokeShellCommand("eslint", []);
+    await this.invokeShellCommand('eslint', ['.']);
   }
 }

@@ -1,7 +1,7 @@
-import { CoreScriptBase } from "../coreScriptBase";
+import { CoreScriptBase } from '../coreScriptBase';
 export class LintFixScript extends CoreScriptBase {
   get name(): string {
-    return "lint-fix";
+    return 'lint-fix';
   }
 
   get description(): string {
@@ -13,6 +13,6 @@ export class LintFixScript extends CoreScriptBase {
   }
 
   protected async main() {
-    await this.invokeShellCommand('eslint', ['--fix']);
+    await this.invokeShellCommand('eslint', ['.', '--fix']);
   }
 }

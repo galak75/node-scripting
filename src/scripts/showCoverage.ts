@@ -1,7 +1,7 @@
-import { Command, program } from "@caporal/core";
-import * as path from "path";
-import { configs } from "../config/configs";
-import { ScriptBase } from "../scriptBase";
+import { Command, program } from '@caporal/core';
+import * as path from 'path';
+import { configs } from '../config/configs';
+import { ScriptBase } from '../scriptBase';
 
 export interface Options {
   report?: string;
@@ -9,7 +9,7 @@ export interface Options {
 
 export class ShowCoverageScript extends ScriptBase<Options> {
   get name(): string {
-    return "show-coverage";
+    return 'show-coverage';
   }
 
   get description(): string {
@@ -17,7 +17,7 @@ export class ShowCoverageScript extends ScriptBase<Options> {
   }
 
   protected get requiredDependencies(): string[] {
-    return ["nyc"];
+    return ['nyc'];
   }
 
   protected async configure(command: Command): Promise<void> {
@@ -29,11 +29,11 @@ export class ShowCoverageScript extends ScriptBase<Options> {
 
   protected async main() {
     if (configs.isWindows) {
-      await this.invokeShellCommand("start", ["", this.getReportDir()], {
+      await this.invokeShellCommand('start', ['', this.getReportDir()], {
         useShellOption: true,
       });
     } else {
-      await this.invokeShellCommand("open", [this.getReportDir()]);
+      await this.invokeShellCommand('open', [this.getReportDir()]);
     }
   }
 
@@ -41,7 +41,7 @@ export class ShowCoverageScript extends ScriptBase<Options> {
     const reportDir = path.resolve(
       configs.projectRoot,
       this.options.report,
-      "lcov-report/index.html"
+      'lcov-report/index.html'
     );
     return reportDir;
   }
