@@ -1,7 +1,4 @@
 import { CoreScriptBase } from '../coreScriptBase';
-import { PrettierFixScript } from './prettierFix';
-import { TsLintFixScript } from './tsLintFix';
-
 export class LintFixScript extends CoreScriptBase {
   get name(): string {
     return 'lint-fix';
@@ -10,13 +7,12 @@ export class LintFixScript extends CoreScriptBase {
   get description(): string {
     return (
       `Fix the project formating using the Prettier rules` +
-      `and the TSLint rules. Note that some TSLint errors may not` +
+      `Fix the project formating using the ESLint rules. Note that some ESLint errors may not` +
       `be fixable automatically and may need manual help.`
     );
   }
 
   protected async main() {
-    await this.invokeScript(PrettierFixScript, {}, {});
-    await this.invokeScript(TsLintFixScript, {}, {});
+    await this.invokeShellCommand('eslint', ['.', '--fix']);
   }
 }

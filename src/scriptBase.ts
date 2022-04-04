@@ -8,7 +8,7 @@ import {
   Logger,
   ParsedArgumentsObject,
   ParsedOptions,
-  Program
+  Program,
 } from '@caporal/core';
 import { globalConstants, utils } from '@villedemontreal/general-utils';
 import { StdioOptions } from 'child_process';
@@ -178,7 +178,8 @@ export abstract class ScriptBase<
    */
   protected async withTestsNodeAppInstance<T = void>(runner: () => Promise<T>): Promise<T> {
     const nodeAppInstanceOriginal = process.env[globalConstants.envVariables.NODE_APP_INSTANCE];
-    process.env[globalConstants.envVariables.NODE_APP_INSTANCE] = globalConstants.appInstances.TESTS;
+    process.env[globalConstants.envVariables.NODE_APP_INSTANCE] =
+      globalConstants.appInstances.TESTS;
     try {
       return await runner();
     } finally {
@@ -208,7 +209,7 @@ export abstract class ScriptBase<
     const actionParams: ActionParameters = {
       ...this.actionParams,
       options: allOptions as unknown as ParsedOptions,
-      args
+      args,
     };
     const script = new scriptType(actionParams);
     return await script.run();
@@ -292,7 +293,7 @@ export abstract class ScriptBase<
   }
 
   protected getCommand() {
-    const command = configs.caporal.getCommands().find(c => c.name === this.name);
+    const command = configs.caporal.getCommands().find((c) => c.name === this.name);
     return command;
   }
 
@@ -302,7 +303,7 @@ export abstract class ScriptBase<
     const command = this.getCommand();
     if (command) {
       for (const option of command.options) {
-        option.allNames.forEach(name => optionsNames.add(name));
+        option.allNames.forEach((name) => optionsNames.add(name));
       }
     }
 
@@ -329,7 +330,7 @@ export abstract class ScriptBase<
       const packageJsonObj = require(`${configs.projectRoot}/package.json`);
       projectDirectDependencies = [
         ...Object.keys(packageJsonObj.dependencies),
-        ...Object.keys(packageJsonObj.devDependencies)
+        ...Object.keys(packageJsonObj.devDependencies),
       ];
     }
     return projectDirectDependencies;
@@ -352,14 +353,18 @@ export abstract class ScriptBase<
 
     const missingDirectDeps = _.difference(requiredDeps, projectDeps);
     if (missingDirectDeps && missingDirectDeps.length > 0) {
-      this.logger.warn(`This script requires some dependencies that are not direct dependencies in your project:`);
+      this.logger.warn(
+        `This script requires some dependencies that are not direct dependencies in your project:`
+      );
       for (const missingDep of missingDirectDeps) {
         this.logger.warn(`- ${missingDep}`);
       }
       this.logger.warn(
         `The script may still work if those dependencies are available ${chalk.italic(
           'transitively'
-        )}, but it may be a good idea to add them directly to your "${chalk.cyanBright('package.json')}" file.`
+        )}, but it may be a good idea to add them directly to your "${chalk.cyanBright(
+          'package.json'
+        )}" file.`
       );
     }
   }
@@ -376,7 +381,7 @@ export abstract class ScriptBase<
 
     return {
       ...currentGlobalOptions,
-      ...options
+      ...options,
     };
   }
 

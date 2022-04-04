@@ -42,11 +42,11 @@
     "tslint.enable": true,
     "tslint.autoFixOnSave": true,
 
-    "editor.defaultFormatter": "esbenp.prettier-vscode",
+    "editor.defaultFormatter": "dbaeumer.vscode-eslint",
     "[typescript]": {
-        "editor.defaultFormatter": "esbenp.prettier-vscode",
+        "editor.defaultFormatter": "dbaeumer.vscode-eslint",
         "editor.codeActionsOnSave": {
-            "source.organizeImports": true
+            "source.fixAll": true
         }
     }
 }

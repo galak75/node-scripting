@@ -11,10 +11,15 @@ export interface SonarProjectInformation {
 }
 
 export abstract class SonarBaseScript<Options> extends ScriptBase<Options> {
-  protected async sonarProjectAlreadyExists(sonarProjectKey: string, sonarHostUrl: string): Promise<boolean> {
+  protected async sonarProjectAlreadyExists(
+    sonarProjectKey: string,
+    sonarHostUrl: string
+  ): Promise<boolean> {
     let res;
 
-    this.logger.debug(`*** Calling Sonar host check whether ${sonarHostUrl} Sonar instance is reachable...`);
+    this.logger.debug(
+      `*** Calling Sonar host check whether ${sonarHostUrl} Sonar instance is reachable...`
+    );
 
     try {
       res = await request.head(new URL(sonarHostUrl).toString()).redirects(5).timeout(20000);
@@ -56,13 +61,17 @@ export abstract class SonarBaseScript<Options> extends ScriptBase<Options> {
     const sonarProperties = properties.of('sonar-project.properties');
     const result = {
       sonarHostUrl: sonarProperties.get('sonar.host.url'),
-      sonarProjectKey: sonarProperties.get('sonar.projectKey')
+      sonarProjectKey: sonarProperties.get('sonar.projectKey'),
     };
     if (!result.sonarHostUrl) {
-      throw new Error('"sonar.host.url" property must be defined in "sonar-project.properties" file!');
+      throw new Error(
+        '"sonar.host.url" property must be defined in "sonar-project.properties" file!'
+      );
     }
     if (!result.sonarProjectKey) {
-      throw new Error('"sonar.projectKey" property must be defined in "sonar-project.properties" file!');
+      throw new Error(
+        '"sonar.projectKey" property must be defined in "sonar-project.properties" file!'
+      );
     }
     return result;
   }

@@ -17,7 +17,10 @@ export async function main(caporal: Program, projectScriptsIndexModule: string, 
 
   await manageHelpCommand(caporal, localArgv);
 
-  const projectScriptsNames: Set<string> = await addProjectScripts(caporal, projectScriptsIndexModule);
+  const projectScriptsNames: Set<string> = await addProjectScripts(
+    caporal,
+    projectScriptsIndexModule
+  );
   await addCoreScripts(caporal, projectScriptsNames);
 
   let executedCommand: any;
@@ -67,7 +70,7 @@ function addUnhandledRejectionHandler() {
 }
 
 async function manageHelpCommand(caporal: Program, localArgv: string[]) {
-  const helpCommand = (await caporal.getAllCommands()).find(cmd => cmd.name === 'help');
+  const helpCommand = (await caporal.getAllCommands()).find((cmd) => cmd.name === 'help');
   if (helpCommand) {
     patchHelpCommand(caporal, helpCommand);
 
@@ -126,7 +129,13 @@ async function printHelpOnCaporalError(
   // ==========================================
   // Unknown command, display global help
   // ==========================================
-  if (err && err.message && err.message.startsWith('Unknown command ') && err.meta && err.meta.command) {
+  if (
+    err &&
+    err.message &&
+    err.message.startsWith('Unknown command ') &&
+    err.meta &&
+    err.meta.command
+  ) {
     await executeHelp(caporal, argv);
   }
 
@@ -139,7 +148,9 @@ async function printHelpOnCaporalError(
 }
 
 async function executeHelp(caporal: Program, argv: string[], command?: string) {
-  const helpOptions = argv.filter(arg => ['-v', '--verbose', '--quiet', '--silent', '--color'].includes(arg));
+  const helpOptions = argv.filter((arg) =>
+    ['-v', '--verbose', '--quiet', '--silent', '--color'].includes(arg)
+  );
   const args = ['help'];
   if (command) {
     args.push(command);
@@ -149,7 +160,10 @@ async function executeHelp(caporal: Program, argv: string[], command?: string) {
   await caporal.run(args);
 }
 
-async function addProjectScripts(caporal: Program, scriptsIndexModule: string): Promise<Set<string>> {
+async function addProjectScripts(
+  caporal: Program,
+  scriptsIndexModule: string
+): Promise<Set<string>> {
   const scriptsNames: Set<string> = new Set();
 
   if (scriptsIndexModule) {

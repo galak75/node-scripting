@@ -29,10 +29,14 @@ export class TestUnitsScript extends CoreScriptBase<Options> {
   protected async configure(command: Command): Promise<void> {
     command.option(`--bail`, `Stop the execution of the tests as soon as an error occures.`);
     command.option(`--jenkins`, `Configure the tests to be run by Jenkins.`);
-    command.option(`--report <path>`, `The relative path to the report, when the tests are run for Jenkins.`, {
-      default: `output/test-results/report.xml`,
-      validator: program.STRING
-    });
+    command.option(
+      `--report <path>`,
+      `The relative path to the report, when the tests are run for Jenkins.`,
+      {
+        default: `output/test-results/report.xml`,
+        validator: program.STRING,
+      }
+    );
   }
   protected async main() {
     const cmdArgs = [];
@@ -88,7 +92,7 @@ export class TestUnitsScript extends CoreScriptBase<Options> {
 
     try {
       await this.invokeShellCommand('node', cmdArgs, {
-        useTestsNodeAppInstance: true
+        useTestsNodeAppInstance: true,
       });
 
       this.logger.info(
@@ -104,7 +108,7 @@ export class TestUnitsScript extends CoreScriptBase<Options> {
       return [];
     }
 
-    return tokens.map(token => {
+    return tokens.map((token) => {
       return _.isNil(token) ? token : `"${_.trim(token, '"')}"`;
     });
   }

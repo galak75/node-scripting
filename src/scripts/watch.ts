@@ -1,12 +1,13 @@
 /* eslint-disable @typescript-eslint/require-await */
+/* eslint-disable no-control-regex */
+/* eslint-disable no-constant-condition */
 import { Command } from '@caporal/core';
 import { utils } from '@villedemontreal/general-utils';
 import * as _ from 'lodash';
 import * as path from 'path';
 import { configs } from '../config/configs';
 import { CoreScriptBase } from '../coreScriptBase';
-const notifier = require('node-notifier');
-
+import notifier = require('node-notifier');
 export interface Options {
   /**
    * Disable the visual notification
@@ -39,7 +40,6 @@ that point since the incremental compilation is already done by this script.`;
         `Starting incremental compilation...\n` +
         `==========================================\n`
     );
-    const projectName = require(configs.projectRoot + '/package.json').name;
     let ignoreNextCompilationComplete = false;
     const compilationCompletetRegEx = /(Compilation complete)|(Found 0 errors)/;
     const errorRegEx = /(: error)|(error)/;
@@ -48,7 +48,7 @@ that point since the incremental compilation is already done by this script.`;
       if (stdoutData) {
         const stdoutDataClean = stdoutData.toString();
         this.logger.info(stdoutDataClean);
-
+        const projectName = require(configs.projectRoot + '/package.json').name;
         if (this.options.dn) {
           return;
         }
@@ -60,7 +60,7 @@ that point since the incremental compilation is already done by this script.`;
             title: projectName,
             message: 'incremental compilation error',
             icon: path.normalize(`${__dirname}/../../../assets/notifications/error.png`),
-            sound: false
+            sound: false,
           });
         } else if (compilationCompletetRegEx.test(stdoutDataClean)) {
           if (!ignoreNextCompilationComplete) {
@@ -68,7 +68,7 @@ that point since the incremental compilation is already done by this script.`;
               title: projectName,
               message: 'incremental compilation done',
               icon: path.normalize(`${__dirname}/../../../assets/notifications/success.png`),
-              sound: false
+              sound: false,
             });
           }
         }
@@ -89,10 +89,10 @@ that point since the incremental compilation is already done by this script.`;
             '--project',
             configs.projectRoot,
             '--watch',
-            '--pretty'
+            '--pretty',
           ],
           {
-            outputHandler
+            outputHandler,
           }
         );
       } catch (err) {

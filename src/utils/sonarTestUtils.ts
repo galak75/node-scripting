@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/ban-types */
-const nock = require('nock');
+import nock = require('nock');
 
 export function simulateSonarServerIsNotFound() {
   nock('https://example.com').head(RegExp('/sonar/{0,1}')).reply(404);
@@ -41,7 +41,7 @@ export class LoggerRecorder {
             // eslint-disable-next-line prefer-rest-params
             that.recordedLogs += `${prop.toString()}: ${arguments[0]}\n`;
           };
-        }
+        },
       }
     );
   }

@@ -18,7 +18,7 @@ export class TestingScript extends ScriptBase<Options> {
   protected async configure(command: Command): Promise<void> {
     command.option(`--throwError`, `Throw an error`);
     command.option(`-p, --port <number>`, `A port number`, {
-      validator: caporal.NUMBER
+      validator: caporal.NUMBER,
     });
   }
 

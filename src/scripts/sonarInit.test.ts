@@ -3,6 +3,7 @@
 /* eslint-disable @typescript-eslint/ban-types */
 /* eslint-disable no-console */
 /* eslint-disable max-lines-per-function */
+/* eslint-disable prettier/prettier */
 import { assert, expect } from 'chai';
 import * as fs from 'fs-extra';
 import { describe, it } from 'mocha';
@@ -11,7 +12,7 @@ import {
   LoggerRecorder,
   simulateSonarProjectAlreadyExists,
   simulateSonarProjectDoesNotYetExist,
-  simulateSonarServerIsNotFound
+  simulateSonarServerIsNotFound,
 } from '../utils/sonarTestUtils';
 import { setTestingConfigs, timeout } from '../utils/testingUtils';
 import { SONAR_SCANNER } from './sonar';
@@ -34,13 +35,13 @@ function getSonarInitScript(logger: {}): SonarInitScript {
     program: sinon.stub() as any,
     command: sinon.stub() as any,
     ddash: sinon.stub() as any,
-    logger: logger as any
+    logger: logger as any,
   });
 }
 
 const validPropertyFiles = [
   './src/utils/test-sonar-project_url-with-trailing-slash.properties',
-  './src/utils/test-sonar-project_url-without-trailing-slash.properties'
+  './src/utils/test-sonar-project_url-without-trailing-slash.properties',
 ];
 
 describe('sonar-init script', function () {
@@ -56,7 +57,7 @@ describe('sonar-init script', function () {
 
     await expect(sonarInitScript.run()).to.be.rejectedWith(
       Error,
-      "ENOENT: no such file or directory, open 'sonar-project.properties'"
+      "ENOENT: no such file or directory, open 'sonar-project.properties'",
     );
 
     expect(loggerRecorder.recordedLogs).to.equal(`info: Script "sonar-init" starting...
@@ -64,7 +65,7 @@ error: Script "sonar-init" failed after 0 s with: ENOENT: no such file or direct
 `);
   });
 
-  validPropertyFiles.forEach(propertyFile => {
+  validPropertyFiles.forEach((propertyFile) => {
     // eslint-disable-next-line @typescript-eslint/require-await
     describe(` when using "${propertyFile}" valid property file`, async () => {
       before(async () => {
@@ -90,13 +91,16 @@ error: Script "sonar-init" failed after 0 s with: ENOENT: no such file or direct
 
         await sonarInitScript.run();
 
-        assert.isTrue(nock.isDone(), `There are remaining expected HTTP calls: ${nock.pendingMocks().toString()}`);
+        assert.isTrue(
+          nock.isDone(),
+          `There are remaining expected HTTP calls: ${nock.pendingMocks().toString()}`,
+        );
 
         expect(loggerRecorder.recordedLogs)
           .to.startWith('info: Script "sonar-init" starting...\n')
           .and.to.contain("info: Initializing 'my-test-project-key' Sonar project...\n")
           .and.to.contain(
-            "warn: 'my-test-project-key' Sonar project already exists at https://example.com/sonar/dashboard?id=my-test-project-key ! Skipping sonar initialization...\n"
+            "warn: 'my-test-project-key' Sonar project already exists at https://example.com/sonar/dashboard?id=my-test-project-key ! Skipping sonar initialization...\n",
           )
           .and.to.endWith('info: Script "sonar-init" successful after 0 s\n');
 
@@ -107,29 +111,25 @@ error: Script "sonar-init" failed after 0 s with: ENOENT: no such file or direct
       it(` should initialize sonar project when it does not yet exist.`, async () => {
         simulateSonarProjectDoesNotYetExist();
 
-        // @ts-ignore
-        const shellCommand = sandbox.stub(SonarInitScript.prototype, 'invokeShellCommand').returns(Promise.resolve(0));
-
         const loggerRecorder = new LoggerRecorder();
         const sonarInitScript = getSonarInitScript(loggerRecorder.logger);
 
         await sonarInitScript.run();
 
-        assert.isTrue(nock.isDone(), `There are remaining expected HTTP calls: ${nock.pendingMocks().toString()}`);
+        assert.isTrue(
+          nock.isDone(),
+          `There are remaining expected HTTP calls: ${nock.pendingMocks().toString()}`,
+        );
 
         expect(loggerRecorder.recordedLogs)
           .to.startWith('info: Script "sonar-init" starting...\n')
           .and.to.contain("info: Initializing 'my-test-project-key' Sonar project...\n")
           .and.to.contain(
-            "info: 'my-test-project-key' Sonar project successfully initialized, and available at https://example.com/sonar/dashboard?id=my-test-project-key\n"
+            "info: 'my-test-project-key' Sonar project successfully initialized, and available at https://example.com/sonar/dashboard?id=my-test-project-key\n",
           )
           .and.to.endWith('info: Script "sonar-init" successful after 0 s\n');
 
         expect(loggerRecorder.recordedLogs).to.not.contain('warn');
-
-        shellCommand.should.have.been.calledTwice;
-        shellCommand.should.have.been.calledWithExactly(SONAR_SCANNER, []);
-        shellCommand.should.have.been.calledWithExactly(SONAR_SCANNER, ['-Dsonar.branch.name=develop']);
       });
 
       it(` should fail when sonar project initialization fails.`, async () => {
@@ -137,19 +137,29 @@ error: Script "sonar-init" failed after 0 s with: ENOENT: no such file or direct
 
         // @ts-ignore
         const shellCommand = sandbox.stub(SonarInitScript.prototype, 'invokeShellCommand');
-        shellCommand.withArgs(SONAR_SCANNER).rejects(new Error('An error occured while analyzing code.'));
+        shellCommand
+          .withArgs(SONAR_SCANNER)
+          .rejects(new Error('An error occured while analyzing code.'));
 
         const loggerRecorder = new LoggerRecorder();
         const sonarInitScript = getSonarInitScript(loggerRecorder.logger);
 
-        await expect(sonarInitScript.run()).to.be.rejectedWith(Error, 'An error occured while analyzing code.');
+        await expect(sonarInitScript.run()).to.be.rejectedWith(
+          Error,
+          'An error occured while analyzing code.',
+        );
 
-        assert.isTrue(nock.isDone(), `There are remaining expected HTTP calls: ${nock.pendingMocks().toString()}`);
+        assert.isTrue(
+          nock.isDone(),
+          `There are remaining expected HTTP calls: ${nock.pendingMocks().toString()}`,
+        );
 
         expect(loggerRecorder.recordedLogs)
           .to.startWith('info: Script "sonar-init" starting...\n')
           .and.to.contain("info: Initializing 'my-test-project-key' Sonar project...\n")
-          .and.to.endWith('error: Script "sonar-init" failed after 0 s with: An error occured while analyzing code.\n');
+          .and.to.endWith(
+            'error: Script "sonar-init" failed after 0 s with: An error occured while analyzing code.\n',
+          );
 
         expect(loggerRecorder.recordedLogs).to.not.contain('warn');
 
@@ -167,14 +177,17 @@ error: Script "sonar-init" failed after 0 s with: ENOENT: no such file or direct
 
         await expect(sonarInitScript.run()).to.be.rejectedWith(Error, 'Not Found');
 
-        assert.isTrue(nock.isDone(), `There are remaining expected HTTP calls: ${nock.pendingMocks().toString()}`);
+        assert.isTrue(
+          nock.isDone(),
+          `There are remaining expected HTTP calls: ${nock.pendingMocks().toString()}`,
+        );
 
         expect(loggerRecorder.recordedLogs)
           .to.startWith('info: Script "sonar-init" starting...\n')
           .and.to.contain("info: Initializing 'my-test-project-key' Sonar project...\n")
           .and.to.contain.oneOf([
             'error: "https://example.com/sonar/" Sonar server is not reachable.',
-            'error: "https://example.com/sonar" Sonar server is not reachable.'
+            'error: "https://example.com/sonar" Sonar server is not reachable.',
           ])
           .and.to.endWith('error: Script "sonar-init" failed after 0 s with: Not Found\n');
 

@@ -17,7 +17,7 @@ export class TestingExampleScript extends ScriptBase<Options> {
   protected async configure(command: Command): Promise<void> {
     command.option(`--lucky <number>`, `A lucky number`, {
       required: true,
-      validator: caporal.NUMBER
+      validator: caporal.NUMBER,
     });
   }
 

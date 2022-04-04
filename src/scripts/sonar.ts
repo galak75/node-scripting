@@ -57,7 +57,7 @@ export class SonarScript extends SonarBaseScript<Options> {
     await this.invokeShellCommand('git', ['branch', '--show-current'], {
       outputHandler: (stdoutOutput: string) => {
         currentBranch = stdoutOutput.trim();
-      }
+      },
     });
     return currentBranch;
   }

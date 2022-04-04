@@ -24,10 +24,10 @@ export class TestingScriptWithArgs extends ScriptBase<Options, IGlobalOptions, A
     command.argument(`<name>`, `a name`);
     command.option(`--port <number>`, `A port number`, {
       required: true,
-      validator: caporal.NUMBER
+      validator: caporal.NUMBER,
     });
     command.option(`--delay <number>`, `A delay in ms`, {
-      validator: caporal.NUMBER
+      validator: caporal.NUMBER,
     });
     command.option(`--throwError`, `Throw an error`);
   }
