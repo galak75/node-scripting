@@ -13,8 +13,8 @@ import {
   simulateSonarProjectAlreadyExists,
   simulateSonarProjectDoesNotYetExist,
   simulateSonarServerIsNotFound,
-} from '../utils/sonarTestUtils';
-import { setTestingConfigs, timeout } from '../utils/testingUtils';
+} from '../../src/utils/sonarTestUtils';
+import { setTestingConfigs, timeout } from '../../src/utils/testingUtils';
 import { SONAR_SCANNER } from './sonar';
 import { SonarInitScript } from './sonarInit';
 
@@ -57,7 +57,7 @@ describe('sonar-init script', function () {
 
     await expect(sonarInitScript.run()).to.be.rejectedWith(
       Error,
-      "ENOENT: no such file or directory, open 'sonar-project.properties'",
+      "ENOENT: no such file or directory, open 'sonar-project.properties'"
     );
 
     expect(loggerRecorder.recordedLogs).to.equal(`info: Script "sonar-init" starting...
@@ -93,14 +93,14 @@ error: Script "sonar-init" failed after 0 s with: ENOENT: no such file or direct
 
         assert.isTrue(
           nock.isDone(),
-          `There are remaining expected HTTP calls: ${nock.pendingMocks().toString()}`,
+          `There are remaining expected HTTP calls: ${nock.pendingMocks().toString()}`
         );
 
         expect(loggerRecorder.recordedLogs)
           .to.startWith('info: Script "sonar-init" starting...\n')
           .and.to.contain("info: Initializing 'my-test-project-key' Sonar project...\n")
           .and.to.contain(
-            "warn: 'my-test-project-key' Sonar project already exists at https://example.com/sonar/dashboard?id=my-test-project-key ! Skipping sonar initialization...\n",
+            "warn: 'my-test-project-key' Sonar project already exists at https://example.com/sonar/dashboard?id=my-test-project-key ! Skipping sonar initialization...\n"
           )
           .and.to.endWith('info: Script "sonar-init" successful after 0 s\n');
 
@@ -118,14 +118,14 @@ error: Script "sonar-init" failed after 0 s with: ENOENT: no such file or direct
 
         assert.isTrue(
           nock.isDone(),
-          `There are remaining expected HTTP calls: ${nock.pendingMocks().toString()}`,
+          `There are remaining expected HTTP calls: ${nock.pendingMocks().toString()}`
         );
 
         expect(loggerRecorder.recordedLogs)
           .to.startWith('info: Script "sonar-init" starting...\n')
           .and.to.contain("info: Initializing 'my-test-project-key' Sonar project...\n")
           .and.to.contain(
-            "info: 'my-test-project-key' Sonar project successfully initialized, and available at https://example.com/sonar/dashboard?id=my-test-project-key\n",
+            "info: 'my-test-project-key' Sonar project successfully initialized, and available at https://example.com/sonar/dashboard?id=my-test-project-key\n"
           )
           .and.to.endWith('info: Script "sonar-init" successful after 0 s\n');
 
@@ -146,19 +146,19 @@ error: Script "sonar-init" failed after 0 s with: ENOENT: no such file or direct
 
         await expect(sonarInitScript.run()).to.be.rejectedWith(
           Error,
-          'An error occured while analyzing code.',
+          'An error occured while analyzing code.'
         );
 
         assert.isTrue(
           nock.isDone(),
-          `There are remaining expected HTTP calls: ${nock.pendingMocks().toString()}`,
+          `There are remaining expected HTTP calls: ${nock.pendingMocks().toString()}`
         );
 
         expect(loggerRecorder.recordedLogs)
           .to.startWith('info: Script "sonar-init" starting...\n')
           .and.to.contain("info: Initializing 'my-test-project-key' Sonar project...\n")
           .and.to.endWith(
-            'error: Script "sonar-init" failed after 0 s with: An error occured while analyzing code.\n',
+            'error: Script "sonar-init" failed after 0 s with: An error occured while analyzing code.\n'
           );
 
         expect(loggerRecorder.recordedLogs).to.not.contain('warn');
@@ -179,7 +179,7 @@ error: Script "sonar-init" failed after 0 s with: ENOENT: no such file or direct
 
         assert.isTrue(
           nock.isDone(),
-          `There are remaining expected HTTP calls: ${nock.pendingMocks().toString()}`,
+          `There are remaining expected HTTP calls: ${nock.pendingMocks().toString()}`
         );
 
         expect(loggerRecorder.recordedLogs)

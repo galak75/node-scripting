@@ -1,7 +1,7 @@
 import * as path from 'path';
 import * as request from 'superagent';
 import { URL } from 'url';
-import { ScriptBase } from '../scriptBase';
+import { ScriptBase } from '../../src';
 
 const properties = require('java-properties');
 

@@ -34,6 +34,6 @@ export class TestingScript extends ScriptBase<Options> {
 
     this.logger.info(`port: ${this.options.port}`);
 
-    this.logger.info(`silent: ${this.options.silent}`);
+    this.logger.info(`silent: ${String(this.options.silent)}`);
   }
 }

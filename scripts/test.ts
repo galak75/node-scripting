@@ -1,5 +1,5 @@
 import { Command, program } from '@caporal/core';
-import { CoreScriptBase } from '../coreScriptBase';
+import { ScriptBase } from '../src';
 import { LintScript } from './lint';
 import { TestUnitsScript } from './testUnits';
 
@@ -9,19 +9,13 @@ export interface Options {
   report?: string;
 }
 
-export class TestScript extends CoreScriptBase<Options> {
+export class TestScript extends ScriptBase<Options> {
   get name(): string {
     return 'test';
   }
 
   get description(): string {
-    return (
-      `Run the unit tests + the linting validations. If your project ` +
-      `has extra validations to perform in its "test" script, you can create a ` +
-      `custom script named "test", add your extra validations and invoke ` +
-      `this core script inside of it. By using the same name ("test") for your script, ` +
-      `it will override this one.`
-    );
+    return `Run the unit tests + the linting validations.`;
   }
 
   protected async configure(command: Command): Promise<void> {

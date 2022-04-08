@@ -1,8 +1,5 @@
 /* eslint-disable @typescript-eslint/no-misused-promises */
-/* eslint-disable @typescript-eslint/require-await */
-/* eslint-disable no-console */
-/* eslint-disable prefer-rest-params */
-/* eslint-disable max-lines-per-function */
+
 import { program as caporal, Program } from '@caporal/core';
 import { globalConstants, utils } from '@villedemontreal/general-utils';
 import { assert } from 'chai';
@@ -10,7 +7,7 @@ import * as fs from 'fs-extra';
 import * as path from 'path';
 import * as sinon from 'sinon';
 import { TestingScript } from '../scripts/testing/testingScript';
-
+import { configs } from './config/configs';
 import {
   containsText,
   isMainHelpDisplayed,
@@ -352,6 +349,25 @@ describe(`Scripts tests`, function () {
       assert.isTrue(found);
     });
 
+    it(`Calling a script using NPM`, async () => {
+      let output = ``;
+      await utils.exec(
+        configs.isWindows ? 'npm.cmd' : 'npm',
+        [`run`, `lint`, `--`, `--nc`, `--help`],
+        {
+          outputHandler: (stdoutData: string, stderrData: string) => {
+            const newOut = `${stdoutData ? ' ' + stdoutData : ''} ${
+              stderrData ? ' ' + stderrData : ''
+            } `;
+            output += newOut;
+          },
+        }
+      );
+
+      assert.isTrue(output.indexOf(`Run the ESLint validation`) > -1);
+      assert.isFalse(isMainHelpDisplayed(output));
+    });
+
     /**
      * Note that it is way easier to call a script
      * programatically *from another script*, since you
@@ -369,8 +385,8 @@ describe(`Scripts tests`, function () {
           get: (target, prop) => {
             return function () {
               if (prop === 'info') {
-                // eslint-disable-next-line @typescript-eslint/restrict-plus-operands
-                output += arguments[0] + '\n';
+                // eslint-disable-next-line prefer-rest-params
+                output += `${arguments[0]}\n`;
               }
             };
           },
@@ -396,13 +412,6 @@ describe(`Scripts tests`, function () {
       const { output, isSuccess } = await run(`testing:testingScript`, `--nc`);
       assert.isTrue(isSuccess);
       assert.isTrue(output.indexOf(`Script "testing:testingScript"`) > -1);
-    });
-
-    it(`OutputName - Core script`, async () => {
-      // Core script
-      const { output, isSuccess } = await run(`testing:testingCoreScript`, `--nc`);
-      assert.isTrue(isSuccess);
-      assert.isTrue(output.indexOf(`Script "testing:testingCoreScript (core)"`) > -1);
     });
 
     /**
@@ -433,12 +442,13 @@ describe(`Scripts tests`, function () {
       const { output, isSuccess } = await withCustomRunFile(
         'scriptsIndexModule: `./scripts/index`,',
         ``,
-        `prettier`,
+        `lint`,
         `--help`,
         `--nc`
       );
 
       assert.isTrue(isSuccess);
+      assert.isTrue(output.indexOf(`Run the ESLint validation`) > -1);
       assert.isFalse(isMainHelpDisplayed(output));
     });
 
@@ -607,6 +617,24 @@ info: Script "testing:testingCallingScript" successful`;
       delete process.env[globalConstants.envVariables.NODE_APP_INSTANCE];
 
       const { output, isSuccess } = await withLogNodeInstance(`testing:testingScript`, `--nc`);
+      assert.isTrue(isSuccess);
+
+      assert.isTrue(output.indexOf(`MAIN NODE_APP_INSTANCE: tests`) > -1);
+    });
+
+    it(`non test script -> not set to "tests"`, async () => {
+      delete process.env[globalConstants.envVariables.NODE_APP_INSTANCE];
+
+      const { output, isSuccess } = await withLogNodeInstance(`lint`, `--nc`);
+      assert.isTrue(isSuccess);
+
+      assert.isTrue(output.indexOf(`MAIN NODE_APP_INSTANCE: undefined`) > -1);
+    });
+
+    it(`non test script with "--testing"`, async () => {
+      delete process.env[globalConstants.envVariables.NODE_APP_INSTANCE];
+
+      const { output, isSuccess } = await withLogNodeInstance(`lint`, `--nc`, `--testing`);
       assert.isTrue(isSuccess);
 
       assert.isTrue(output.indexOf(`MAIN NODE_APP_INSTANCE: tests`) > -1);

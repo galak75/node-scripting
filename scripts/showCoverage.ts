@@ -1,7 +1,7 @@
 import { Command, program } from '@caporal/core';
 import * as path from 'path';
-import { configs } from '../config/configs';
-import { ScriptBase } from '../scriptBase';
+import { ScriptBase } from '../src';
+import { configs } from '../src/config/configs';
 
 export interface Options {
   report?: string;

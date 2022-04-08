@@ -34,7 +34,9 @@ export class TestingScriptWithArgs extends ScriptBase<Options, IGlobalOptions, A
 
   protected async main() {
     this.logger.info(
-      `Start service ${this.args.name} on port ${this.options.port} with delay ${this.options.delay}, --verbose: ${this.options.verbose}`
+      `Start service ${this.args.name} on port ${this.options.port} with delay ${String(
+        this.options.delay
+      )}, --verbose: ${String(this.options.verbose)}`
     );
     if (this.options.throwError) {
       throw new Error('Some error...');

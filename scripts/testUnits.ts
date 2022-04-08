@@ -1,8 +1,9 @@
-/* eslint-disable @typescript-eslint/require-await */
 import { Command, program } from '@caporal/core';
 import * as _ from 'lodash';
-import { configs } from '../config/configs';
-import { CoreScriptBase } from '../coreScriptBase';
+import { ScriptBase } from '../src';
+import { configs } from '../src/config/configs';
+
+const TESTS_LOCATIONS = [`${configs.libRoot}/dist/src/**/*.test.js`];
 
 export interface Options {
   bail?: boolean;
@@ -10,20 +11,13 @@ export interface Options {
   report?: string;
 }
 
-export class TestUnitsScript extends CoreScriptBase<Options> {
+export class TestUnitsScript extends ScriptBase<Options> {
   get name(): string {
     return 'test-units';
   }
 
   get description(): string {
     return `Run the unit tests.`;
-  }
-  protected get requiredDependencies(): string[] {
-    const deps = ['mocha'];
-    if (this.options.jenkins) {
-      deps.push('mocha-jenkins-reporter');
-    }
-    return deps;
   }
 
   protected async configure(command: Command): Promise<void> {
@@ -38,6 +32,25 @@ export class TestUnitsScript extends CoreScriptBase<Options> {
       }
     );
   }
+
+  protected get requiredDependencies(): string[] {
+    const deps = ['mocha'];
+    if (this.options.jenkins) {
+      deps.push('mocha-jenkins-reporter');
+    }
+    return deps;
+  }
+
+  private addQuotes(tokens: string[]): string[] {
+    if (_.isNil(tokens) || tokens.length === 0) {
+      return [];
+    }
+
+    return tokens.map((token) => {
+      return _.isNil(token) ? token : `"${_.trim(token, '"')}"`;
+    });
+  }
+
   protected async main() {
     const cmdArgs = [];
 
@@ -58,7 +71,7 @@ export class TestUnitsScript extends CoreScriptBase<Options> {
     //
     // @see https://mochajs.org/#the-test-directory
     // ==========================================
-    cmdArgs.push(...this.addQuotes(configs.testsLocations));
+    cmdArgs.push(...this.addQuotes(TESTS_LOCATIONS));
 
     cmdArgs.push(`--exit`);
 
@@ -101,15 +114,5 @@ export class TestUnitsScript extends CoreScriptBase<Options> {
     } catch (err) {
       throw new Error('Some unit tests failed');
     }
-  }
-
-  private addQuotes(tokens: string[]): string[] {
-    if (_.isNil(tokens) || tokens.length === 0) {
-      return [];
-    }
-
-    return tokens.map((token) => {
-      return _.isNil(token) ? token : `"${_.trim(token, '"')}"`;
-    });
   }
 }

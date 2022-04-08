@@ -1,6 +1,3 @@
-/* eslint-disable prefer-rest-params */
-/* eslint-disable @typescript-eslint/no-unsafe-return */
-/* eslint-disable no-console */
 import { Action, ActionParameters, chalk, Command, Program } from '@caporal/core';
 import { globalConstants } from '@villedemontreal/general-utils';
 import { IScriptConstructor, ScriptBase, TESTING_SCRIPT_NAME_PREFIX } from './scriptBase';
@@ -17,11 +14,7 @@ export async function main(caporal: Program, projectScriptsIndexModule: string, 
 
   await manageHelpCommand(caporal, localArgv);
 
-  const projectScriptsNames: Set<string> = await addProjectScripts(
-    caporal,
-    projectScriptsIndexModule
-  );
-  await addCoreScripts(caporal, projectScriptsNames);
+  await addProjectScripts(caporal, projectScriptsIndexModule);
 
   let executedCommand: any;
   addExecutedCommandExtractor();
@@ -57,14 +50,14 @@ export async function main(caporal: Program, projectScriptsIndexModule: string, 
     const runOriginal = caporal['_run'].bind(caporal);
     caporal['_run'] = async function (result: any, cmd: any) {
       executedCommand = cmd;
+      // eslint-disable-next-line prefer-rest-params
       return await runOriginal(...arguments);
     };
   }
 }
 
 function addUnhandledRejectionHandler() {
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  process.on('unhandledRejection', (reason, p) => {
+  process.on('unhandledRejection', (reason) => {
     console.error(`Promise rejection error : ${reason}`);
   });
 }
@@ -177,22 +170,6 @@ async function addProjectScripts(
   }
 
   return scriptsNames;
-}
-
-async function addCoreScripts(caporal: Program, projectScriptsNames: Set<string>) {
-  const scriptsModule = require(`./scripts`);
-  for (const scriptClass of Object.values(scriptsModule)) {
-    const script: ScriptBase = new (scriptClass as IScriptConstructor)(null);
-
-    // ==========================================
-    // A project script can override a core script by
-    // using the same name.
-    // ==========================================
-    if (!script.name || projectScriptsNames.has(script.name)) {
-      continue;
-    }
-    await registerScript(caporal, script);
-  }
 }
 
 /**

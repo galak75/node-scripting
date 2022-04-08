@@ -6,6 +6,9 @@
     "project": ["./tsconfig.json"],
     "es6": true
   },
+  "env": {
+    "node": true
+  },
   "extends": [
     "eslint:recommended",
     "plugin:@typescript-eslint/eslint-recommended",
@@ -14,12 +17,9 @@
     "prettier"
   ],
   "rules": {
-    // 0 means "off"
-    // 1 means "warning"
-    // 2 means "error"
-    "prettier/prettier": 2,
-    "@typescript-eslint/no-floating-promises": 2,
-    "@typescript-eslint/no-explicit-any": 0,
+    "prettier/prettier": "error",
+    "@typescript-eslint/no-floating-promises": "error",
+    "@typescript-eslint/no-explicit-any": "off",
     "@typescript-eslint/require-await": "off",
     "@typescript-eslint/no-var-requires": "off",
     "@typescript-eslint/no-unsafe-argument": "off",

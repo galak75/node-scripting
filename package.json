@@ -15,8 +15,9 @@
     "test": "node run test",
     "lint": "node run lint",
     "lint-fix": "node run lint-fix",
-    "lint:fix": "eslint . --fix",
-    "watch": "node run watch"
+    "watch": "node run watch",
+    "sonar-init": "node run sonar-init",
+    "sonar": "node run sonar"
   },
   "repository": {
     "type": "git",
@@ -48,9 +49,9 @@
   "devDependencies": {
     "@types/chai": "4.3.0",
     "@types/chai-as-promised": "7.1.4",
-    "@types/chai-string": "~1.4.2",
+    "@types/chai-string": "1.4.2",
     "@types/mocha": "9.0.0",
-    "@types/node-notifier": "^8.0.2",
+    "@types/node-notifier": "8.0.2",
     "@types/sinon": "10.0.6",
     "@types/sinon-chai": "3.2.8",
     "@types/superagent": "4.1.14",
@@ -58,7 +59,7 @@
     "@typescript-eslint/parser": "5.12.1",
     "chai": "4.3.4",
     "chai-as-promised": "7.1.1",
-    "chai-string": "~1.5.0",
+    "chai-string": "1.5.0",
     "eslint": "8.9.0",
     "eslint-config-prettier": "8.4.0",
     "eslint-plugin-prettier": "4.0.0",

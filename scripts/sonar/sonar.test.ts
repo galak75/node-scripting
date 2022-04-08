@@ -12,8 +12,8 @@ import {
   simulateSonarProjectAlreadyExists,
   simulateSonarProjectDoesNotYetExist,
   simulateSonarServerIsNotFound,
-} from '../utils/sonarTestUtils';
-import { setTestingConfigs, timeout } from '../utils/testingUtils';
+} from '../../src/utils/sonarTestUtils';
+import { setTestingConfigs, timeout } from '../../src/utils/testingUtils';
 import { SonarScript, SONAR_SCANNER } from './sonar';
 import { SonarInitScript } from './sonarInit';
 

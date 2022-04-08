@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/require-await */
 import { Command } from '@caporal/core';
-import { IGlobalOptions } from '../globalOptions';
+import { IGlobalOptions } from '../../src';
 import { SonarBaseScript } from './sonarBase';
 import { SonarInitScript } from './sonarInit';
 

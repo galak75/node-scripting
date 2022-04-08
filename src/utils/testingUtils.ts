@@ -1,4 +1,3 @@
-/* eslint-disable no-console */
 import { program as caporal } from '@caporal/core';
 import { globalConstants, utils } from '@villedemontreal/general-utils';
 import { assert } from 'chai';
@@ -11,7 +10,6 @@ export function setTestingConfigs() {
   configs.setCaporal(caporal);
   configs.setProjectRoot(path.resolve(`${__dirname}/../../..`));
   configs.setProjectOutDir(`${configs.projectRoot}/dist`);
-  configs.setTestsLocations([`${configs.projectRoot}/src/**/*.test.js`]);
 }
 
 /**

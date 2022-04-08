@@ -13,7 +13,6 @@ export class Configs {
   public isWindows: boolean;
   private projectRootVar: string;
   private projectOutDirVar: string;
-  private testsLocationsVar: string[];
   private caporalVar: Program;
 
   constructor() {
@@ -34,11 +33,19 @@ export class Configs {
     return this.caporalVar;
   }
 
+  public setCaporal(caporal: Program) {
+    this.caporalVar = caporal;
+  }
+
   public get projectRoot() {
     if (!this.projectRootVar) {
       throw new Error(`The project root must have been set on the configurations!`);
     }
     return this.projectRootVar;
+  }
+
+  public setProjectRoot(projectRoot: string) {
+    this.projectRootVar = projectRoot;
   }
 
   public get projectOutDir() {
@@ -48,27 +55,8 @@ export class Configs {
     return this.projectOutDirVar;
   }
 
-  public get testsLocations() {
-    if (!this.testsLocationsVar) {
-      throw new Error(`The project tests locations must have been set on the configurations!`);
-    }
-    return this.testsLocationsVar;
-  }
-
-  public setCaporal(caporal: Program) {
-    this.caporalVar = caporal;
-  }
-
-  public setProjectRoot(projectRoot: string) {
-    this.projectRootVar = projectRoot;
-  }
-
   public setProjectOutDir(projectOutDir: string) {
     this.projectOutDirVar = projectOutDir;
-  }
-
-  public setTestsLocations(testsLocations: string[]) {
-    this.testsLocationsVar = testsLocations;
   }
 }
 

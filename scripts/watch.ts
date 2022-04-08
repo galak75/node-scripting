@@ -1,13 +1,11 @@
-/* eslint-disable @typescript-eslint/require-await */
-/* eslint-disable no-control-regex */
-/* eslint-disable no-constant-condition */
 import { Command } from '@caporal/core';
 import { utils } from '@villedemontreal/general-utils';
 import * as _ from 'lodash';
 import * as path from 'path';
-import { configs } from '../config/configs';
-import { CoreScriptBase } from '../coreScriptBase';
-import notifier = require('node-notifier');
+import { ScriptBase } from '../src';
+import { configs } from '../src/config/configs';
+const notifier = require('node-notifier');
+
 export interface Options {
   /**
    * Disable the visual notification
@@ -15,7 +13,7 @@ export interface Options {
   dn?: boolean;
 }
 
-export class WatchScript extends CoreScriptBase<Options> {
+export class WatchScript extends ScriptBase<Options> {
   get name(): string {
     return 'watch';
   }
@@ -40,15 +38,17 @@ that point since the incremental compilation is already done by this script.`;
         `Starting incremental compilation...\n` +
         `==========================================\n`
     );
+    const projectName = require(configs.projectRoot + '/package.json').namae;
     let ignoreNextCompilationComplete = false;
     const compilationCompletetRegEx = /(Compilation complete)|(Found 0 errors)/;
+    // eslint-disable-next-line no-control-regex
     const errorRegEx = /(: error)|(error)/;
 
     const outputHandler = (stdoutData: string, stderrData: string): void => {
       if (stdoutData) {
         const stdoutDataClean = stdoutData.toString();
         this.logger.info(stdoutDataClean);
-        const projectName = require(configs.projectRoot + '/package.json').name;
+
         if (this.options.dn) {
           return;
         }
@@ -80,6 +80,7 @@ that point since the incremental compilation is already done by this script.`;
       }
     };
 
+    // eslint-disable-next-line no-constant-condition
     while (true) {
       try {
         await this.invokeShellCommand(
@@ -104,7 +105,7 @@ that point since the incremental compilation is already done by this script.`;
           process.exit(0);
         }
 
-        this.logger.error(`Error, restarting incremental compilation in a second : ${err}`);
+        this.logger.error('Error, restarting incremental compilation in a second : ' + String(err));
         await utils.sleep(1000);
       }
     }
