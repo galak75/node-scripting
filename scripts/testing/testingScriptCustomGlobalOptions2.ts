@@ -19,6 +19,6 @@ export class TestingScriptGlobalCustomOptions2 extends ScriptBase<Options, ITest
     // ==========================================
     // Uses the custom global option => compiled!
     // ==========================================
-    this.logger.info(`custom #2: ${this.options.custom}`);
+    this.logger.info(`custom #2: ${String(this.options.custom)}`);
   }
 }

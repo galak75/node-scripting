@@ -24,19 +24,7 @@ avant de mourir (Voir [pod-lifecycle/pod-termination](https://kubernetes.io/docs
 
 ### Installation
 
-Un projet doit contenir quelques dépendances pour être en mesure d'utiliser certains scripts fournis
-par cette librairie:
-
-- `typescript`
-- `@villemontreal/core-utils-scripting-core-nodejs-lib`, la librairie elle-même.
-- `@villemontreal/lint-config-villemontreal`, pour être en mesure d'utiliser les scripts core de lintage.
-- `mocha`, pour être en mesure d'utiliser les scripts core `test` et `test-units`.
-- `mocha-jenkins-reporter`, pour être en mesure d'utiliser les scripts core `test` et `test-units`, avec l'option `--jenkins`.
-- `nyc`, pour être en mesure d'utiliser le script core `show-coverage`. Remarquez aussi que si cette dépendance
-  n'est pas trouvée dans votre projet, les tests seront exécutés uniquement avec `Mocha`, sans code coverage
-  (un avertissement sera affiché).
-
-Il faut aussi créer deux fichiers à la racine du projet:
+Il faut créer deux fichiers à la racine du projet:
 
 1. `run.cmd` contenant:
 
@@ -49,18 +37,19 @@ node "%~dp0\run" %*
 
 ```javascript
 #!/usr/bin/env node
-const caporal = require('@caporal/core').program;
+const caporal = require("@caporal/core").program;
 
 // Here, you could add custom global options, or tweak
 // the Caporal instance, if required.
 
 // Then it is run:
-require(`${__dirname}/node_modules/@villemontreal/core-utils-scripting-core-nodejs-lib/dist/src/run`).run({
-  caporal,
-  projectRoot: __dirname,
-  scriptsIndexModule: `./scripts/index`,
-  testsLocations: [`./src/**/*.test.js`, `./tests/**/*.test.js`]
-});
+require(`${__dirname}/node_modules/@villemontreal/core-utils-scripting-core-nodejs-lib/dist/src/run`).run(
+  {
+    caporal,
+    projectRoot: __dirname,
+    scriptsIndexModule: `./scripts/index`,
+  }
+);
 ```
 
 **Note**: si vous êtes sur Linux/Mac, vous devrez aussi lancer `chmod +x run` pour rendre exécutable le fichier `./run`.
@@ -76,8 +65,6 @@ Il est possible de configurer certains aspects de la librairie dans le fichier `
 - `scriptsIndexModule` : qui est le chemin vers l'index (le fichier Typescript) exportant les scripts custom de votre projet.
   Dans un projet d'API, ce chemin ne devrait probablement pas être changé. Notez que si votre projet ne définie pas de
   scripts custom, vous pouvez complètement enlever ce paramètre ou encore le mettre à `null`.
-
-- `testsLocations` : qui liste les endroits où des fichiers de tests peuvent être trouvés dans votre application.
 
 ### Lancer un script
 
@@ -116,9 +103,9 @@ en sorte que les configurations `-tests` seront utilisées.
 
 Autrement, vous pouvez spécifier l'option globale `--testing` pour forcer cette valeur.
 
-### Ajouter un script custom dans votre projet
+### Ajouter un script dans votre projet
 
-Un script propre à un projet sera ajouté en général ajouté sous un répetoire "`scripts`" racine.
+Un script sera ajouté en général ajouté sous un répetoire "`scripts`" racine.
 Notez que vous pouvez créer plusieurs niveaux de sous-répertoires.
 
 Vous devez exporter un nouveau script dans l'_index_ de vos scripts (`scripts/index.ts`).
@@ -186,8 +173,8 @@ Pour se faire, vous
    Par exemple:
 
 ```javascript
-caporal.option('--custom', 'Custom global option', {
-  global: true
+caporal.option("--custom", "Custom global option", {
+  global: true,
 });
 ```
 
@@ -221,40 +208,13 @@ Notez que les options _globales_ seront automatiquement disponibles par le scrip
 Un utilitaire fourni `this.invokeShellCommand(...)` permet de lancer une commande shell dans un script. Par exemple:
 
 ```typescript
-await this.invokeShellCommand('node', ['some/js/module', '--somearg']);
+await this.invokeShellCommand("node", ["some/js/module", "--somearg"]);
 ```
 
 Le troisième paramètre est un objet `options`. Une de ces options est `useTestsNodeAppInstance` que
 vous pouvez mettre à `true` pour lancer le nouveau process avec une variable d'environnement
 "`NODE_APP_INSTANCE`" égale à "`tests`" et d'ainsi faire en sorte que les configurations de tests
 soient utilisées si du code de l'API est exécuté dans le process.
-
-### Overrider un script core
-
-Il est possible d'overrider un script core (c'est à dire un script fourni par cette librairie). Par exemple,
-vous voulez ajouter des validations supplémentaires lorsque `run test` est exécuté, en addition du lintage et
-des tests unitaires lancés par le script `test` core fourni par cette librairie.
-
-Pour se faire, vous créez simplement un nouveau script dans votre projet et vous lui donner le même nom que le
-script à overrider. Puis, dans la méthode `main()` de votre nouveau script, vous invoquez le script core en
-lui passant les options requises et vous ajoutez tout autre code requis par la suite.
-
-**Note**: Si vous _héritez_ de la classe du script core pour implémenter votre version du script, n'oubliez pas
-de redéfinir la méthode `outputName()` pour lui faire retourner le nom du script directement! Autrement
-il sera affiché "`- core`" dans les logs! Par exemple:
-
-```typescript
-get outputName(): string {
-  return this.name;
-}
-```
-
-**Note** Dans de rares cas où vous devriez overrider des script cores _qui ne sont pas compilés automatiquement par défaut_,
-vous devrez spécifier le nom de ces scripts dans le paramètre `overridenCoreScripts` du fichier `run`. Ceci indique à la
-librairie de scripting qu'elle _doit_ effectuer la compilation, malgré qu'il s'agisse de scripts core qui ne
-le sont pas par défaut. Présentement, les scripts core non compilés par défaut sont:  
-`prettier`, `prettier-fix`, `tslint`, `tslint-fix`, `lint`, `lint-fix` et `watch`. Bref, des scripts qui n'ont
-pas à être overridés en général!
 
 ### Ajouter un script en mode "testing"
 
@@ -306,6 +266,13 @@ Ceci est passablement plus verbeux que la méthode utilisant `run` directement:
 
 ## Développement de la librairie
 
+### Lintage
+
+Utilisez un éditeur (VSCode a été testé) avec ces extensions installées:
+
+- `ESLint`
+- `Prettier`
+
 ### Launch configurations
 
 Ces "_launch configurations_" sont founies pour développer la librairie dans VSCode :
@@ -321,12 +288,6 @@ Ces "_launch configurations_" sont founies pour développer la librairie dans VS
   des breakpoints et ils seront respectés.
 
 - "`Debug current tests file - fast`" - Lance en mode debug le fichier de tests présentement ouvert dans VSCode. Aucune compilation n'est effectuée au préalable. Cette _launch configuration_ doit être utilisée lorsque la compilation incrémentale roule (en lançant au préalable `run watch` dans un terminal).
-
-### Ajouter un script core à la librairie
-
-1. Créez le nouveau script sous `src/scripts`.
-
-2. Exporter le script dans l'index `src/scripts/index`.
 
 ### Test et publication de la librairie sur Nexus
 

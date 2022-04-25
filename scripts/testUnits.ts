@@ -1,7 +1,9 @@
 import { Command, program } from '@caporal/core';
 import * as _ from 'lodash';
-import { configs } from '../config/configs';
-import { CoreScriptBase } from '../coreScriptBase';
+import { ScriptBase } from '../src';
+import { configs } from '../src/config/configs';
+
+const TESTS_LOCATIONS = [`${configs.libRoot}/dist/src/**/*.test.js`];
 
 export interface Options {
   bail?: boolean;
@@ -9,7 +11,7 @@ export interface Options {
   report?: string;
 }
 
-export class TestUnitsScript extends CoreScriptBase<Options> {
+export class TestUnitsScript extends ScriptBase<Options> {
   get name(): string {
     return 'test-units';
   }
@@ -21,10 +23,14 @@ export class TestUnitsScript extends CoreScriptBase<Options> {
   protected async configure(command: Command): Promise<void> {
     command.option(`--bail`, `Stop the execution of the tests as soon as an error occures.`);
     command.option(`--jenkins`, `Configure the tests to be run by Jenkins.`);
-    command.option(`--report <path>`, `The relative path to the report, when the tests are run for Jenkins.`, {
-      default: `output/test-results/report.xml`,
-      validator: program.STRING
-    });
+    command.option(
+      `--report <path>`,
+      `The relative path to the report, when the tests are run for Jenkins.`,
+      {
+        default: `output/test-results/report.xml`,
+        validator: program.STRING,
+      }
+    );
   }
 
   protected get requiredDependencies(): string[] {
@@ -40,7 +46,7 @@ export class TestUnitsScript extends CoreScriptBase<Options> {
       return [];
     }
 
-    return tokens.map(token => {
+    return tokens.map((token) => {
       return _.isNil(token) ? token : `"${_.trim(token, '"')}"`;
     });
   }
@@ -65,7 +71,7 @@ export class TestUnitsScript extends CoreScriptBase<Options> {
     //
     // @see https://mochajs.org/#the-test-directory
     // ==========================================
-    cmdArgs.push(...this.addQuotes(configs.testsLocations));
+    cmdArgs.push(...this.addQuotes(TESTS_LOCATIONS));
 
     cmdArgs.push(`--exit`);
 
@@ -99,7 +105,7 @@ export class TestUnitsScript extends CoreScriptBase<Options> {
 
     try {
       await this.invokeShellCommand('node', cmdArgs, {
-        useTestsNodeAppInstance: true
+        useTestsNodeAppInstance: true,
       });
 
       this.logger.info(

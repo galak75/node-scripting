@@ -13,7 +13,6 @@ export class Configs {
   public isWindows: boolean;
   private projectRootVar: string;
   private projectOutDirVar: string;
-  private testsLocationsVar: string[];
   private caporalVar: Program;
 
   constructor() {
@@ -59,17 +58,6 @@ export class Configs {
   public setProjectOutDir(projectOutDir: string) {
     this.projectOutDirVar = projectOutDir;
   }
-
-  public get testsLocations() {
-    if (!this.testsLocationsVar) {
-      throw new Error(`The project tests locations must have been set on the configurations!`);
-    }
-    return this.testsLocationsVar;
-  }
-
-  public setTestsLocations(testsLocations: string[]) {
-    this.testsLocationsVar = testsLocations;
-  }
 }
 
-export let configs: Configs = new Configs();
+export const configs: Configs = new Configs();

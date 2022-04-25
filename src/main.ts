@@ -1,4 +1,3 @@
-// tslint:disable:no-console
 import { Action, ActionParameters, chalk, Command, Program } from '@caporal/core';
 import { globalConstants } from '@villedemontreal/general-utils';
 import { IScriptConstructor, ScriptBase, TESTING_SCRIPT_NAME_PREFIX } from './scriptBase';
@@ -15,8 +14,7 @@ export async function main(caporal: Program, projectScriptsIndexModule: string, 
 
   await manageHelpCommand(caporal, localArgv);
 
-  const projectScriptsNames: Set<string> = await addProjectScripts(caporal, projectScriptsIndexModule);
-  await addCoreScripts(caporal, projectScriptsNames);
+  await addProjectScripts(caporal, projectScriptsIndexModule);
 
   let executedCommand: any;
   addExecutedCommandExtractor();
@@ -49,24 +47,23 @@ export async function main(caporal: Program, projectScriptsIndexModule: string, 
   }
 
   function addExecutedCommandExtractor() {
-    // tslint:disable-next-line: no-string-literal
     const runOriginal = caporal['_run'].bind(caporal);
-    // tslint:disable-next-line: no-string-literal only-arrow-functions
-    caporal['_run'] = async function(result: any, cmd: any) {
+    caporal['_run'] = async function (result: any, cmd: any) {
       executedCommand = cmd;
+      // eslint-disable-next-line prefer-rest-params
       return await runOriginal(...arguments);
     };
   }
 }
 
 function addUnhandledRejectionHandler() {
-  process.on('unhandledRejection', (reason, p) => {
-    console.error('Promise rejection error : ' + reason);
+  process.on('unhandledRejection', (reason) => {
+    console.error(`Promise rejection error : ${reason}`);
   });
 }
 
 async function manageHelpCommand(caporal: Program, localArgv: string[]) {
-  const helpCommand = (await caporal.getAllCommands()).find(cmd => cmd.name === 'help');
+  const helpCommand = (await caporal.getAllCommands()).find((cmd) => cmd.name === 'help');
   if (helpCommand) {
     patchHelpCommand(caporal, helpCommand);
 
@@ -89,6 +86,7 @@ function patchHelpCommand(caporal: Program, helpCommand: Command) {
     throw new Error('Help command has already been patched');
   }
   (helpCommand as any)._action = (actionParams: ActionParameters) => {
+    // eslint-disable-next-line @typescript-eslint/no-misused-promises
     return new Promise(async (resolve, reject) => {
       // ==========================================
       // The "help" output seems to be done asynchronously,
@@ -124,7 +122,13 @@ async function printHelpOnCaporalError(
   // ==========================================
   // Unknown command, display global help
   // ==========================================
-  if (err && err.message && err.message.startsWith('Unknown command ') && err.meta && err.meta.command) {
+  if (
+    err &&
+    err.message &&
+    err.message.startsWith('Unknown command ') &&
+    err.meta &&
+    err.meta.command
+  ) {
     await executeHelp(caporal, argv);
   }
 
@@ -137,7 +141,9 @@ async function printHelpOnCaporalError(
 }
 
 async function executeHelp(caporal: Program, argv: string[], command?: string) {
-  const helpOptions = argv.filter(arg => ['-v', '--verbose', '--quiet', '--silent', '--color'].includes(arg));
+  const helpOptions = argv.filter((arg) =>
+    ['-v', '--verbose', '--quiet', '--silent', '--color'].includes(arg)
+  );
   const args = ['help'];
   if (command) {
     args.push(command);
@@ -147,7 +153,10 @@ async function executeHelp(caporal: Program, argv: string[], command?: string) {
   await caporal.run(args);
 }
 
-async function addProjectScripts(caporal: Program, scriptsIndexModule: string): Promise<Set<string>> {
+async function addProjectScripts(
+  caporal: Program,
+  scriptsIndexModule: string
+): Promise<Set<string>> {
   const scriptsNames: Set<string> = new Set();
 
   if (scriptsIndexModule) {
@@ -161,22 +170,6 @@ async function addProjectScripts(caporal: Program, scriptsIndexModule: string): 
   }
 
   return scriptsNames;
-}
-
-async function addCoreScripts(caporal: Program, projectScriptsNames: Set<string>) {
-  const scriptsModule = require(`./scripts`);
-  for (const scriptClass of Object.values(scriptsModule)) {
-    const script: ScriptBase = new (scriptClass as IScriptConstructor)(null);
-
-    // ==========================================
-    // A project script can override a core script by
-    // using the same name.
-    // ==========================================
-    if (!script.name || projectScriptsNames.has(script.name)) {
-      continue;
-    }
-    await registerScript(caporal, script);
-  }
 }
 
 /**

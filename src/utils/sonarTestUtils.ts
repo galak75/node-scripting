@@ -1,15 +1,12 @@
-const nock = require('nock');
+/* eslint-disable @typescript-eslint/ban-types */
+import nock = require('nock');
 
 export function simulateSonarServerIsNotFound() {
-  nock('https://example.com')
-    .head(RegExp('/sonar/{0,1}'))
-    .reply(404);
+  nock('https://example.com').head(RegExp('/sonar/{0,1}')).reply(404);
 }
 
 function simulateSonarServerIsOk() {
-  nock('https://example.com')
-    .head(RegExp('/sonar/{0,1}'))
-    .reply(200);
+  nock('https://example.com').head(RegExp('/sonar/{0,1}')).reply(200);
 }
 
 export function simulateSonarProjectDoesNotYetExist() {
@@ -34,17 +31,17 @@ export class LoggerRecorder {
 
   constructor() {
     this.recordedLogs = '';
-    // tslint:disable-next-line:no-this-assignment
+    // eslint-disable-next-line @typescript-eslint/no-this-alias
     const that = this;
     this.logger = new Proxy(
       {},
       {
         get: (target, prop) => {
-          // tslint:disable-next-line: only-arrow-functions
-          return function() {
+          return function () {
+            // eslint-disable-next-line prefer-rest-params
             that.recordedLogs += `${prop.toString()}: ${arguments[0]}\n`;
           };
-        }
+        },
       }
     );
   }

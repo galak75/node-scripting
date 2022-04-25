@@ -1,24 +1,15 @@
-// tslint:disable
 const execSync = require('child_process').execSync;
 const path = require('path');
 const fs = require('fs-extra');
 const _ = require('lodash');
-const chalk = require('@caporal/core').chalk;
 const globalConstants = require('@villedemontreal/general-utils').globalConstants;
 
 let _isScriptingLibItself;
 
-exports.run = async function(params) {
+exports.run = async function (params) {
   try {
-    const {
-      caporal,
-      projectRoot,
-      scriptsIndexModule,
-      outDir,
-      deleteOutDirBeforeCompilation,
-      testsLocations,
-      overridenCoreScripts
-    } = cleanParams(params);
+    const { caporal, projectRoot, scriptsIndexModule, outDir, deleteOutDirBeforeCompilation } =
+      cleanParams(params);
 
     caporal.name('Montreal CLI').description('A CLI tool for managing your API development tasks');
 
@@ -26,24 +17,18 @@ exports.run = async function(params) {
 
     addCompileCommand(caporal, projectRoot, outDir, deleteOutDirBeforeCompilation);
 
-    const noCompilScripts = getNoCompilScripts(overridenCoreScripts);
     const scriptName = process.argv.length > 2 ? process.argv[2] : null;
 
     // ==========================================
-    // Run the compilation, except on scripts
-    // that have been specified as not requiring
-    // it.
+    // Run the compilation
     // ==========================================
-    if (!scriptName || !noCompilScripts.includes(scriptName)) {
-      const compileOptions = process.argv.filter(arg =>
-        ['--nc', '-v', '--verbose', '--quiet', '--silent', '--no-color'].includes(arg)
-      );
-      await caporal.run(['compile', ...compileOptions]);
+    const compileOptions = process.argv.filter((arg) =>
+      ['--nc', '-v', '--verbose', '--quiet', '--silent', '--no-color'].includes(arg)
+    );
+    await caporal.run(['compile', ...compileOptions]);
 
-      if (scriptName === 'c' || scriptName === 'compile') {
-        process.exit(0);
-        return;
-      }
+    if (scriptName === 'c' || scriptName === 'compile') {
+      process.exit(0);
     }
 
     setTestsNodeAppInstanceIfRequired(scriptName);
@@ -54,7 +39,6 @@ exports.run = async function(params) {
     configs.setCaporal(caporal);
     configs.setProjectRoot(projectRoot);
     configs.setProjectOutDir(outDir);
-    configs.setTestsLocations(testsLocations);
 
     const { main } = require(`${libModulePrefix}/main`);
     const exitCode = await main(caporal, scriptsIndexModule);
@@ -91,12 +75,13 @@ function setTestsNodeAppInstanceIfRequired(scriptName) {
         scriptName.startsWith('test-') ||
         scriptName.startsWith('testing:')))
   ) {
-    process.env[globalConstants.envVariables.NODE_APP_INSTANCE] = globalConstants.appInstances.TESTS;
+    process.env[globalConstants.envVariables.NODE_APP_INSTANCE] =
+      globalConstants.appInstances.TESTS;
   }
 }
 
 function cleanParams(params) {
-  let { caporal, projectRoot, scriptsIndexModule, testsLocations, overridenCoreScripts } = params;
+  let { caporal, projectRoot, scriptsIndexModule } = params;
   let deleteOutDirBeforeCompilation = false;
   let outDir = projectRoot;
 
@@ -109,7 +94,9 @@ function cleanParams(params) {
     const tsConfigObj = require(tsConfigPath);
     const outDirRel = tsConfigObj?.compilerOptions?.outDir;
     if (outDirRel && !['.', './'].includes(outDirRel)) {
-      outDir = path.normalize(`${projectRoot}/${outDirRel.startsWith(`./`) ? outDirRel.substring(2) : outDirRel}`);
+      outDir = path.normalize(
+        `${projectRoot}/${outDirRel.startsWith(`./`) ? outDirRel.substring(2) : outDirRel}`
+      );
       deleteOutDirBeforeCompilation = true;
     }
   }
@@ -119,42 +106,13 @@ function cleanParams(params) {
       ? `${_.trimEnd(outDir, '/')}/${scriptsIndexModule.substring(2)}`
       : scriptsIndexModule;
 
-  testsLocations = testsLocations.map(dir => {
-    if (dir.startsWith(`./`)) {
-      dir = `${outDir}/${dir.substring(2)}`;
-    }
-    return path.normalize(dir);
-  });
-
   return {
     caporal,
     projectRoot,
     scriptsIndexModule,
     outDir,
     deleteOutDirBeforeCompilation,
-    testsLocations,
-    overridenCoreScripts
   };
-}
-
-function getNoCompilScripts(overridenCoreScripts) {
-  overridenCoreScripts = overridenCoreScripts || [];
-
-  // ==========================================
-  // When running a script on the scripting lib
-  // itself, we don't know if all the scripting
-  // related TS files have been compiled, so we
-  // always have to compile.
-  //
-  // Also, we always have to compile the core scripts
-  // that have been overriden by a project, since
-  // their classes are in Typescript.
-  // ==========================================
-  return isScriptingLibItself()
-    ? []
-    : ['prettier', 'prettier-fix', 'tslint', 'tslint-fix', 'lint', 'lint-fix', 'watch', 'show-coverage'].filter(
-        s => !overridenCoreScripts.includes(s)
-      );
 }
 
 function addCompileCommand(caporal, projectRoot, outDir, deleteOutDirBeforeCompilation) {
@@ -193,7 +151,7 @@ Note that this script is automatically executed first when calling most scripts,
 
 function addCustomGlobalOptions(caporal) {
   caporal.option('--nc', 'Skip compilation', {
-    global: true
+    global: true,
   });
   caporal.option(
     '--testing',
@@ -202,7 +160,7 @@ function addCustomGlobalOptions(caporal) {
       'Note that if the name of the script is "test", "validate", starts with "test-", ' +
       'or starts with "testing:" the variable is automatically set, you don\'t need to use this option.',
     {
-      global: true
+      global: true,
     }
   );
 }
