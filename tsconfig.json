@@ -1,14 +1,24 @@
 {
-  "extends": "./node_modules/@villedemontreal/lint-config/rules/tsconfig-base.json",
   "compilerOptions": {
+    "target": "ES2020",
+    "module": "commonjs",
     "sourceMap": true,
     "pretty": true,
     "experimentalDecorators": true,
     "skipLibCheck": true,
-    "declaration": true,
+    "newLine": "LF",
+    "charset": "utf8",
+    "suppressImplicitAnyIndexErrors": true,
+    "alwaysStrict": true,
+    "forceConsistentCasingInFileNames": true,
+    "noImplicitAny": true,
+    "noUnusedLocals": true,
+    "noImplicitReturns": true,
+    "noFallthroughCasesInSwitch": true,
     "outDir": "dist",
     "rootDir": ".",
+    "declaration": true,
     "allowJs": true
   },
-  "include": ["./src", "./scripts", "./assets"]
+  "include": ["./src/**/*.ts", "./scripts/**/*.ts", "./assets/**/*.ts", "./src/run.js"]
 }

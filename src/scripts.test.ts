@@ -1,8 +1,5 @@
-// ==========================================
-// Disabling some linting rules is OK in test files.
-// tslint:disable:max-func-body-length
-// tslint:disable: no-console
-// ==========================================
+/* eslint-disable @typescript-eslint/no-misused-promises */
+
 import { program as caporal, Program } from '@caporal/core';
 import { globalConstants, utils } from '@villedemontreal/general-utils';
 import { assert } from 'chai';
@@ -18,11 +15,11 @@ import {
   setTestingConfigs,
   timeout,
   withCustomRunFile,
-  withLogNodeInstance
+  withLogNodeInstance,
 } from './utils/testingUtils';
 const nock = require('nock');
 
-describe(`Scripts tests`, function() {
+describe(`Scripts tests`, function () {
   timeout(this, 30000);
 
   before(() => {
@@ -30,7 +27,7 @@ describe(`Scripts tests`, function() {
   });
 
   describe(`Compilation`, () => {
-    it(`Default`, async function() {
+    it(`Default`, async function () {
       timeout(this, 60000);
 
       const distDir = path.resolve(`${__dirname}/..`);
@@ -126,7 +123,7 @@ describe(`Scripts tests`, function() {
   });
 
   describe(`Main Help`, () => {
-    it(`No args at all - compilation is done and main help is displayed`, async function() {
+    it(`No args at all - compilation is done and main help is displayed`, async function () {
       timeout(this, 60000);
 
       const { output, isSuccess } = await run();
@@ -138,7 +135,7 @@ describe(`Scripts tests`, function() {
       assert.isTrue(isMainHelpDisplayed(output));
     });
 
-    it(`Just "help" and "--nc" - no compilation is done and main help is displayed`, async function() {
+    it(`Just "help" and "--nc" - no compilation is done and main help is displayed`, async function () {
       timeout(this, 60000);
 
       const { output, isSuccess } = await run(`help`, `--nc`);
@@ -149,7 +146,7 @@ describe(`Scripts tests`, function() {
       assert.isTrue(isMainHelpDisplayed(output));
     });
 
-    it(`Just "--help" - compilation is done and main help is displayed`, async function() {
+    it(`Just "--help" - compilation is done and main help is displayed`, async function () {
       timeout(this, 60000);
 
       const { output, isSuccess } = await run(`--help`);
@@ -160,7 +157,7 @@ describe(`Scripts tests`, function() {
       assert.isTrue(isMainHelpDisplayed(output));
     });
 
-    it(`Just "-h" - compilation is done and main help is displayed`, async function() {
+    it(`Just "-h" - compilation is done and main help is displayed`, async function () {
       timeout(this, 60000);
 
       const { output, isSuccess } = await run(`-h`);
@@ -202,7 +199,7 @@ describe(`Scripts tests`, function() {
       assert.isTrue(isMainHelpDisplayed(output));
     });
 
-    it(`Unknown command - Main help is displayed`, async function() {
+    it(`Unknown command - Main help is displayed`, async function () {
       timeout(this, 60000);
 
       const { output, isSuccess } = await run(`NOPE`, `--nc`);
@@ -212,7 +209,7 @@ describe(`Scripts tests`, function() {
       assert.isTrue(isMainHelpDisplayed(output));
     });
 
-    it(`Unknown command with --silent arg - Main help not displayed`, async function() {
+    it(`Unknown command with --silent arg - Main help not displayed`, async function () {
       timeout(this, 60000);
 
       const { output, isSuccess } = await run(`NOPE`, `--nc`, `--silent`);
@@ -222,7 +219,7 @@ describe(`Scripts tests`, function() {
       assert.isFalse(isMainHelpDisplayed(output));
     });
 
-    it(`Unknown command with --quiet arg - Main help not displayed`, async function() {
+    it(`Unknown command with --quiet arg - Main help not displayed`, async function () {
       timeout(this, 60000);
 
       const { output, isSuccess } = await run(`NOPE`, `--nc`, `--quiet`);
@@ -307,7 +304,12 @@ describe(`Scripts tests`, function() {
     });
 
     it(`Invalid argument`, async () => {
-      const { output, isSuccess } = await run(`testing:testingScript`, `--nc`, `--port`, `notANumber`);
+      const { output, isSuccess } = await run(
+        `testing:testingScript`,
+        `--nc`,
+        `--port`,
+        `notANumber`
+      );
       assert.isFalse(isSuccess);
 
       assert.isTrue(output.indexOf(`Invalid value for option`) > -1);
@@ -316,7 +318,12 @@ describe(`Scripts tests`, function() {
     });
 
     it(`Hidden script can still be called`, async () => {
-      const { output, isSuccess } = await run(`testing:testingHiddenScript`, `--nc`, `--username`, `Stromgol`);
+      const { output, isSuccess } = await run(
+        `testing:testingHiddenScript`,
+        `--nc`,
+        `--username`,
+        `Stromgol`
+      );
       assert.isTrue(isSuccess);
 
       assert.isTrue(output.indexOf(`username is Stromgol`) > -1);
@@ -324,7 +331,9 @@ describe(`Scripts tests`, function() {
 
     it(`We can register a script without passing action parameters`, async () => {
       const prog = new Program();
-      assert.isFalse(caporal.getCommands().some(command => command.name === 'testing:testingScript'));
+      assert.isFalse(
+        caporal.getCommands().some((command) => command.name === 'testing:testingScript')
+      );
 
       const script = new TestingScript(null); // no params!
       await script.registerScript(prog);
@@ -342,14 +351,20 @@ describe(`Scripts tests`, function() {
 
     it(`Calling a script using NPM`, async () => {
       let output = ``;
-      await utils.exec(configs.isWindows ? 'npm.cmd' : 'npm', [`run`, `prettier`, `--`, `--nc`, `--help`], {
-        outputHandler: (stdoutData: string, stderrData: string) => {
-          const newOut = `${stdoutData ? ' ' + stdoutData : ''} ${stderrData ? ' ' + stderrData : ''} `;
-          output += newOut;
+      await utils.exec(
+        configs.isWindows ? 'npm.cmd' : 'npm',
+        [`run`, `lint`, `--`, `--nc`, `--help`],
+        {
+          outputHandler: (stdoutData: string, stderrData: string) => {
+            const newOut = `${stdoutData ? ' ' + stdoutData : ''} ${
+              stderrData ? ' ' + stderrData : ''
+            } `;
+            output += newOut;
+          },
         }
-      });
+      );
 
-      assert.isTrue(output.indexOf(`Validate that the project respects the Prettier rules`) > -1);
+      assert.isTrue(output.indexOf(`Run the ESLint validation`) > -1);
       assert.isFalse(isMainHelpDisplayed(output));
     });
 
@@ -368,25 +383,25 @@ describe(`Scripts tests`, function() {
         {},
         {
           get: (target, prop) => {
-            // tslint:disable-next-line: only-arrow-functions
-            return function() {
+            return function () {
               if (prop === 'info') {
-                output += arguments[0] + '\n';
+                // eslint-disable-next-line prefer-rest-params
+                output += `${arguments[0]}\n`;
               }
             };
-          }
+          },
         }
       );
 
       await new TestingScript({
         args: {},
         options: {
-          port: 789
+          port: 789,
         },
         program: sinon.stub() as any,
         command: sinon.stub() as any,
         ddash: sinon.stub() as any,
-        logger: logger as any
+        logger: logger as any,
       }).run();
 
       assert.isTrue(output.indexOf(`port: 789`) > -1);
@@ -397,13 +412,6 @@ describe(`Scripts tests`, function() {
       const { output, isSuccess } = await run(`testing:testingScript`, `--nc`);
       assert.isTrue(isSuccess);
       assert.isTrue(output.indexOf(`Script "testing:testingScript"`) > -1);
-    });
-
-    it(`OutputName - Core script`, async () => {
-      // Core script
-      const { output, isSuccess } = await run(`testing:testingCoreScript`, `--nc`);
-      assert.isTrue(isSuccess);
-      assert.isTrue(output.indexOf(`Script "testing:testingCoreScript (core)"`) > -1);
     });
 
     /**
@@ -434,13 +442,13 @@ describe(`Scripts tests`, function() {
       const { output, isSuccess } = await withCustomRunFile(
         'scriptsIndexModule: `./scripts/index`,',
         ``,
-        `prettier`,
+        `lint`,
         `--help`,
         `--nc`
       );
 
       assert.isTrue(isSuccess);
-      assert.isTrue(output.indexOf(`Validate that the project respects the Prettier rules.`) > -1);
+      assert.isTrue(output.indexOf(`Run the ESLint validation`) > -1);
       assert.isFalse(isMainHelpDisplayed(output));
     });
 
@@ -448,7 +456,9 @@ describe(`Scripts tests`, function() {
       const { output, isSuccess } = await run(`testing:testingDepMissingScript`, `--nc`);
       assert.isTrue(isSuccess);
 
-      assert.isTrue(output.indexOf(`This script requires some dependencies that are not direct`) > -1);
+      assert.isTrue(
+        output.indexOf(`This script requires some dependencies that are not direct`) > -1
+      );
       assert.isTrue(output.indexOf(`- _missingDependency`) > -1);
 
       // Script still called
@@ -458,7 +468,12 @@ describe(`Scripts tests`, function() {
 
   describe('Cascading scripts', () => {
     it(`Call subscript with defaults`, async () => {
-      const { output, isSuccess } = await run(`testing:testingCallingScript`, `--nc`, `--foo`, `55`);
+      const { output, isSuccess } = await run(
+        `testing:testingCallingScript`,
+        `--nc`,
+        `--foo`,
+        `55`
+      );
       assert.isTrue(isSuccess);
 
       const expectedOutput = `info: Script "testing:testingCallingScript" starting...
@@ -610,7 +625,7 @@ info: Script "testing:testingCallingScript" successful`;
     it(`non test script -> not set to "tests"`, async () => {
       delete process.env[globalConstants.envVariables.NODE_APP_INSTANCE];
 
-      const { output, isSuccess } = await withLogNodeInstance(`prettier`, `--nc`);
+      const { output, isSuccess } = await withLogNodeInstance(`lint`, `--nc`);
       assert.isTrue(isSuccess);
 
       assert.isTrue(output.indexOf(`MAIN NODE_APP_INSTANCE: undefined`) > -1);
@@ -619,7 +634,7 @@ info: Script "testing:testingCallingScript" successful`;
     it(`non test script with "--testing"`, async () => {
       delete process.env[globalConstants.envVariables.NODE_APP_INSTANCE];
 
-      const { output, isSuccess } = await withLogNodeInstance(`prettier`, `--nc`, `--testing`);
+      const { output, isSuccess } = await withLogNodeInstance(`lint`, `--nc`, `--testing`);
       assert.isTrue(isSuccess);
 
       assert.isTrue(output.indexOf(`MAIN NODE_APP_INSTANCE: tests`) > -1);
@@ -663,9 +678,7 @@ error: Script "sonar-init" failed after 0 s with: ENOENT: no such file or direct
           .query({ project: 'my-project-key' })
           .reply(200);
 
-        nock('https://example.com')
-          .get('/sonar/api/another_endpoint')
-          .reply(200);
+        nock('https://example.com').get('/sonar/api/another_endpoint').reply(200);
 
         const { output, isSuccess } = await run(`sonar-init`, '-v');
 
@@ -673,7 +686,10 @@ error: Script "sonar-init" failed after 0 s with: ENOENT: no such file or direct
         console.info(nock.pendingMocks());
         console.info('*************************');
 
-        assert.isTrue(nock.isDone(), `There are remaining expected HTTP calls: ${nock.pendingMocks().toString()}`);
+        assert.isTrue(
+          nock.isDone(),
+          `There are remaining expected HTTP calls: ${nock.pendingMocks().toString()}`
+        );
 
         assert.isTrue(isSuccess);
 

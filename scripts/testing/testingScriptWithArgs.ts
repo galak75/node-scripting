@@ -24,17 +24,19 @@ export class TestingScriptWithArgs extends ScriptBase<Options, IGlobalOptions, A
     command.argument(`<name>`, `a name`);
     command.option(`--port <number>`, `A port number`, {
       required: true,
-      validator: caporal.NUMBER
+      validator: caporal.NUMBER,
     });
     command.option(`--delay <number>`, `A delay in ms`, {
-      validator: caporal.NUMBER
+      validator: caporal.NUMBER,
     });
     command.option(`--throwError`, `Throw an error`);
   }
 
   protected async main() {
     this.logger.info(
-      `Start service ${this.args.name} on port ${this.options.port} with delay ${this.options.delay}, --verbose: ${this.options.verbose}`
+      `Start service ${this.args.name} on port ${this.options.port} with delay ${String(
+        this.options.delay
+      )}, --verbose: ${String(this.options.verbose)}`
     );
     if (this.options.throwError) {
       throw new Error('Some error...');

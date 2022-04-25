@@ -2,8 +2,8 @@ import { Command } from '@caporal/core';
 import { utils } from '@villedemontreal/general-utils';
 import * as _ from 'lodash';
 import * as path from 'path';
-import { configs } from '../config/configs';
-import { CoreScriptBase } from '../coreScriptBase';
+import { ScriptBase } from '../src';
+import { configs } from '../src/config/configs';
 const notifier = require('node-notifier');
 
 export interface Options {
@@ -13,7 +13,7 @@ export interface Options {
   dn?: boolean;
 }
 
-export class WatchScript extends CoreScriptBase<Options> {
+export class WatchScript extends ScriptBase<Options> {
   get name(): string {
     return 'watch';
   }
@@ -34,14 +34,14 @@ that point since the incremental compilation is already done by this script.`;
 
   protected async main() {
     this.logger.info(
-      // tslint:disable-next-line: prefer-template
       `\n==========================================\n` +
         `Starting incremental compilation...\n` +
         `==========================================\n`
     );
-    const projectName = require(configs.projectRoot + '/package.json').name;
+    const projectName = require(configs.projectRoot + '/package.json').namae;
     let ignoreNextCompilationComplete = false;
     const compilationCompletetRegEx = /(Compilation complete)|(Found 0 errors)/;
+    // eslint-disable-next-line no-control-regex
     const errorRegEx = /(: error)|(error)/;
 
     const outputHandler = (stdoutData: string, stderrData: string): void => {
@@ -60,7 +60,7 @@ that point since the incremental compilation is already done by this script.`;
             title: projectName,
             message: 'incremental compilation error',
             icon: path.normalize(`${__dirname}/../../../assets/notifications/error.png`),
-            sound: false
+            sound: false,
           });
         } else if (compilationCompletetRegEx.test(stdoutDataClean)) {
           if (!ignoreNextCompilationComplete) {
@@ -68,7 +68,7 @@ that point since the incremental compilation is already done by this script.`;
               title: projectName,
               message: 'incremental compilation done',
               icon: path.normalize(`${__dirname}/../../../assets/notifications/success.png`),
-              sound: false
+              sound: false,
             });
           }
         }
@@ -80,6 +80,7 @@ that point since the incremental compilation is already done by this script.`;
       }
     };
 
+    // eslint-disable-next-line no-constant-condition
     while (true) {
       try {
         await this.invokeShellCommand(
@@ -89,10 +90,10 @@ that point since the incremental compilation is already done by this script.`;
             '--project',
             configs.projectRoot,
             '--watch',
-            '--pretty'
+            '--pretty',
           ],
           {
-            outputHandler
+            outputHandler,
           }
         );
       } catch (err) {
@@ -102,10 +103,9 @@ that point since the incremental compilation is already done by this script.`;
         if (_.isString(err) && err.indexOf('3221225786') >= 0) {
           this.logger.error('Exiting...');
           process.exit(0);
-          return;
         }
 
-        this.logger.error('Error, restarting incremental compilation in a second : ' + err);
+        this.logger.error('Error, restarting incremental compilation in a second : ' + String(err));
         await utils.sleep(1000);
       }
     }

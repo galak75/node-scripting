@@ -1,7 +1,7 @@
 import { Command, program } from '@caporal/core';
 import * as path from 'path';
-import { configs } from '../config/configs';
-import { ScriptBase } from '../scriptBase';
+import { ScriptBase } from '../src';
+import { configs } from '../src/config/configs';
 
 export interface Options {
   report?: string;
@@ -23,14 +23,14 @@ export class ShowCoverageScript extends ScriptBase<Options> {
   protected async configure(command: Command): Promise<void> {
     command.option(`--report <path>`, `The relative path to the coverage report directory.`, {
       default: `output/coverage`,
-      validator: program.STRING
+      validator: program.STRING,
     });
   }
 
   protected async main() {
     if (configs.isWindows) {
       await this.invokeShellCommand('start', ['', this.getReportDir()], {
-        useShellOption: true
+        useShellOption: true,
       });
     } else {
       await this.invokeShellCommand('open', [this.getReportDir()]);
@@ -38,7 +38,11 @@ export class ShowCoverageScript extends ScriptBase<Options> {
   }
 
   protected getReportDir() {
-    const reportDir = path.resolve(configs.projectRoot, this.options.report, 'lcov-report/index.html');
+    const reportDir = path.resolve(
+      configs.projectRoot,
+      this.options.report,
+      'lcov-report/index.html'
+    );
     return reportDir;
   }
 }

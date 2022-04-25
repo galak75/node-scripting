@@ -1,4 +1,3 @@
-// tslint:disable: no-console
 import { program as caporal } from '@caporal/core';
 import { globalConstants, utils } from '@villedemontreal/general-utils';
 import { assert } from 'chai';
@@ -11,7 +10,6 @@ export function setTestingConfigs() {
   configs.setCaporal(caporal);
   configs.setProjectRoot(path.resolve(`${__dirname}/../../..`));
   configs.setProjectOutDir(`${configs.projectRoot}/dist`);
-  configs.setTestsLocations([`${configs.projectRoot}/src/**/*.test.js`]);
 }
 
 /**
@@ -27,8 +25,8 @@ export function timeout(mocha: Mocha.Suite | Mocha.Context, milliSec: number) {
 export function containsText(corpus: string, text: string) {
   const lines = text
     .split('\n')
-    .map(line => line.trim())
-    .filter(line => line.trim() !== '');
+    .map((line) => line.trim())
+    .filter((line) => line.trim() !== '');
   if (lines.length === 0) {
     return false;
   }
@@ -54,9 +52,11 @@ export async function runCore(runFilePath: string, ...args: string[]) {
   try {
     await utils.exec(runFilePath, args, {
       outputHandler: (stdoutData: string, stderrData: string) => {
-        const newOut = `${stdoutData ? ' ' + stdoutData : ''} ${stderrData ? ' ' + stderrData : ''} `;
+        const newOut = `${stdoutData ? ' ' + stdoutData : ''} ${
+          stderrData ? ' ' + stderrData : ''
+        } `;
         output += newOut;
-      }
+      },
     });
   } catch (err) {
     isSuccess = false;
@@ -64,7 +64,7 @@ export async function runCore(runFilePath: string, ...args: string[]) {
   }
   return {
     output,
-    isSuccess
+    isSuccess,
   };
 }
 
@@ -96,7 +96,10 @@ export async function withCustomRunFile(
     }
     fs.writeFileSync(runCmdTestingFilePath, runCmdContent, 'utf-8');
 
-    const { output, isSuccess } = await runCore(configs.isWindows ? 'runTesting.cmd' : './runTesting', ...runArgs);
+    const { output, isSuccess } = await runCore(
+      configs.isWindows ? 'runTesting.cmd' : './runTesting',
+      ...runArgs
+    );
     return { output, isSuccess };
   } finally {
     if (fs.existsSync(runTestingFilePath)) {
@@ -108,7 +111,9 @@ export async function withCustomRunFile(
   }
 }
 
-export async function withLogNodeInstance(...runArgs: string[]): Promise<{ output: string; isSuccess: boolean }> {
+export async function withLogNodeInstance(
+  ...runArgs: string[]
+): Promise<{ output: string; isSuccess: boolean }> {
   const mainJsPath = `${configs.libRoot}/dist/src/main.js`;
   const mainJsCodeOriginal = fs.readFileSync(mainJsPath, 'utf8');
 
