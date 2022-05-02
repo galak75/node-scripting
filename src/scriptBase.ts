@@ -306,9 +306,10 @@ export abstract class ScriptBase<
   protected async getProjectDirectDependencies() {
     if (!projectDirectDependencies) {
       const packageJsonObj = require(`${configs.projectRoot}/package.json`);
+
       projectDirectDependencies = [
-        ...Object.keys(packageJsonObj.dependencies),
-        ...Object.keys(packageJsonObj.devDependencies),
+        ...Object.keys(packageJsonObj.dependencies || {}),
+        ...Object.keys(packageJsonObj.devDependencies || {}),
       ];
     }
     return projectDirectDependencies;
